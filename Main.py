@@ -1,6 +1,6 @@
 import Config
 from API import Get_Access_Token
-import RequestAPI as RequestAPI
+import RequestAPI
 import os
 
 class Main():

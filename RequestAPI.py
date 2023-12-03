@@ -17,7 +17,7 @@ def api_request(query, variables=None):
     # If the response contains errors, print them
     if 'errors' in response_json:
         for error in response_json['errors']:
-            print(f"Error: {error['message']}. Status: {error['status']}.")
+            print(f"\nError: {error['message']}. Status: {error['status']}.")
 
     # Check the rate limit headers
     rate_limit_remaining = int(response.headers.get('X-RateLimit-Remaining', 0))
@@ -226,6 +226,10 @@ def Like_Activities(total_activities_to_like, include_message_activity):
                     Like_Activity(activity['id'])
                     print(f"Liked activity with ID: {activity['id']} from user with ID: {following_user_id}")
                     activities_liked += 1
+
+            # If there are no more activities, break the loop
+            if not response['data']['Page']['activities']:
+                break
 
             # Go to the next page
             page += 1
