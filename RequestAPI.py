@@ -11,6 +11,7 @@ url = 'https://graphql.anilist.co'
 def api_request(query, variables=None):
     # Send a POST request to the API endpoint
     response = requests.post(url, json={'query': query, 'variables': variables}, headers=headers)
+    #print(response.json())
     
     # Check the rate limit headers
     rate_limit_remaining = int(response.headers.get('X-RateLimit-Remaining', 0))
@@ -19,9 +20,11 @@ def api_request(query, variables=None):
     # If the rate limit has been hit, print a message and wait
     if response.status_code == 429:
         wait_time = rate_limit_reset - int(time.time())
+        # Happens alot when program is rate limited from just doing one feature. Not full site rate limited.
         if wait_time < 0:
             print(f"\nReset time: {wait_time} Seconds\nError: Rate limit reset time is in the past.")
-            wait_time = 65
+            print("Most likely 1 minute rate limited from a specific feature.")
+            wait_time = 60
             print(f"Waiting for {wait_time} seconds.\n")
             time.sleep(wait_time)
         else:
@@ -38,7 +41,7 @@ def api_request(query, variables=None):
         return response.json()
     # If the request was not successful, print an error message and return None
     else:
-        print(f"\nFailed to retrieve data. Status code: {response.status_code}\nAssumming title is not on list\n")
+        print(f"\nFailed to retrieve data. Status code: {response.status_code}\n")
         return None
 
 def Set_Access_Token():
@@ -100,6 +103,9 @@ def Get_Followers():
         for follower in response['data']['Page']['followers']:
             follower_ids.append(follower['id'])
 
+        # Print the ids on this page
+        print(f"Checking Followers, Page {page} ID's: {follower_ids[-len(response['data']['Page']['followers']):]}")
+
         # Check if there are more pages
         hasNextPage = response['data']['Page']['pageInfo']['hasNextPage']
 
@@ -121,6 +127,9 @@ def Get_Following():
         for following in response['data']['Page']['following']:
             following_ids.append(following['id'])
 
+        # Print the ids on this page
+        print(f"Checking Following, Page {page} ID's: {following_ids[-len(response['data']['Page']['following']):]}")
+
         # Check if there are more pages
         hasNextPage = response['data']['Page']['pageInfo']['hasNextPage']
 
@@ -129,3 +138,26 @@ def Get_Following():
 
     return following_ids
 
+def Unfollow_User(id):
+    query, variables = QM.Mutations.Follow_Mutation(id)
+    response = api_request(query, variables)
+    if response is not None:
+        if response['data']['ToggleFollow']['isFollowing'] == False:
+            print(f"Unfollowed {response['data']['ToggleFollow']['name']} with ID: {id}")
+        else:
+            print(f"Error: {response['data']['ToggleFollow']['name']} already unfollowed with ID: {id}")
+            api_request(query, variables)
+    else:
+        print(f"Failed to unfollow user with ID: {id}")
+
+def Follow_User(id):
+    query, variables = QM.Mutations.Follow_Mutation(id)
+    response = api_request(query, variables)
+    if response is not None:
+        if response['data']['ToggleFollow']['isFollowing'] == True:
+            print(f"Followed {response['data']['ToggleFollow']['name']} with ID: {id}")
+        else:
+            print(f"Error: {response['data']['ToggleFollow']['name']} already followed with ID: {id}")
+            api_request(query, variables)
+    else:
+        print(f"Failed to follow user with ID: {id}")

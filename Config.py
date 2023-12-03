@@ -18,22 +18,6 @@ def save_config(config, file_path):
         # Write the configuration dictionary to the file in JSON format
         json.dump(config, file, indent=4)
 
-# Function to get the configuration dictionary
-def Get_Config():
-    # Load the configuration dictionary from the file
-    config = load_config('config.json')
-
-    if config:
-        # If the configuration dictionary is loaded successfully, print a message
-        print("Configuration file found.")
-        
-        # Set the environment variables with the values from the configuration dictionary
-        Set_Environment_Variables(config)
-        print("Environment variables set.")
-    else:
-        # If the configuration dictionary is not loaded successfully, print a message
-        print("\nConfiguration file not found.")
-
 # Function to load the configuration dictionary from a file
 def load_config(file_path):
     try:
@@ -53,3 +37,14 @@ def Set_Environment_Variables(config):
     for key, value in config.items():
         if value is not None:
             os.environ[key] = value
+            
+def load_excluded_ids():
+    try:
+        with open('excluded_ids.json', 'r') as f:
+            return set(json.load(f))
+    except FileNotFoundError:
+        return set()
+
+def save_excluded_ids(excluded_ids):
+    with open('excluded_ids.json', 'w') as f:
+        json.dump(list(excluded_ids), f)

@@ -62,10 +62,10 @@ class Queries:
 
 class Mutations:
     @staticmethod
-    def Unfollow_Mutation(user_id):
+    def Follow_Mutation(user_id):
         Mutation = """
         mutation ($id: Int) {
-            ToggleFollowUser(userId: $id) {
+            ToggleFollow(userId: $id) {
                 id
                 name
                 isFollowing
