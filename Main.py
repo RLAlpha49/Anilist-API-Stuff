@@ -30,8 +30,9 @@ class Main():
                 Config.save_config(config, 'config.json')
                 RequestAPI.Set_Access_Token()
                 refresh = RequestAPI.Check_Access_Token()
+        print('Notice: Anilist will rate limit often, so please be patient when using this program. (Most times it rate limites a specific feature so you should be able to use other features.)')
         while True:
-            option = input("\n0. Exit\n1. Get Users Not Following Back\n2. Get Users You Are Not Following Back\n3. Follow Random Users From Global Activity Feed\nOption: ")
+            option = input("\n0. Exit\n1. Get Users Not Following Back\n2. Get Users You Are Not Following Back\n3. Follow Random Users From Global Activity Feed\n4. Like Followed Users Activity\nOption: ")
             if option == '0':
                 break
             elif option == '1':
@@ -142,6 +143,13 @@ class Main():
                 if pages < 1:
                     pages = 1
                 RequestAPI.Get_Global_Activities(pages, total_people_to_follow)
+            elif option == '4':
+                print()
+                RequestAPI.Get_User_ID()
+                total_activities_to_like = int(input("Enter the number of activities you would like to like per followed user: "))
+                include_message_activity = input("Do you want to like message activities? - Messages sent to the user are considered that users activity. (y/n): ").lower() == 'y'
+                print()
+                RequestAPI.Like_Activities(total_activities_to_like, include_message_activity)
                 
         
 if __name__ == '__main__':

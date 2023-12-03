@@ -11,8 +11,14 @@ url = 'https://graphql.anilist.co'
 def api_request(query, variables=None):
     # Send a POST request to the API endpoint
     response = requests.post(url, json={'query': query, 'variables': variables}, headers=headers)
-    #print(response.json())
-    
+    response_json = response.json()
+    #print(response_json)
+
+    # If the response contains errors, print them
+    if 'errors' in response_json:
+        for error in response_json['errors']:
+            print(f"Error: {error['message']}. Status: {error['status']}.")
+
     # Check the rate limit headers
     rate_limit_remaining = int(response.headers.get('X-RateLimit-Remaining', 0))
     rate_limit_reset = int(response.headers.get('X-RateLimit-Reset', 0))
@@ -188,3 +194,38 @@ def Get_Global_Activities(pages, total_people_to_follow):
         page += 1
 
     return activity_ids
+
+def Like_Activity(id):
+    query, variables = QM.Mutations.Like_Mutation(id)
+    response = api_request(query, variables)
+    #print(response)
+    if response is not None:
+        for item in response['data']['ToggleLike']:
+            if item['id'] == id:
+                print(f"Liked activity with ID: {id}")
+                break
+    else:
+        print(f"Failed to like activity with ID: {id}")
+
+def Like_Activities(total_activities_to_like, include_message_activity):
+    activities_liked = 0
+    following_users = Get_Following()
+    print()
+
+    for following_user_id in following_users:
+        page = 1
+        activities_liked = 0
+        print()
+        while activities_liked < total_activities_to_like:
+            query, variables = QM.Queries.User_Activity_Feed_Query(following_user_id, page, include_message_activity)
+            response = api_request(query, variables)
+
+            # Like the activity if it was not liked before
+            for activity in response['data']['Page']['activities']:
+                if activity and 'isLiked' in activity and not activity['isLiked'] and activities_liked < total_activities_to_like:
+                    Like_Activity(activity['id'])
+                    print(f"Liked activity with ID: {activity['id']} from user with ID: {following_user_id}")
+                    activities_liked += 1
+
+            # Go to the next page
+            page += 1
