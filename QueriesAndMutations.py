@@ -1,4 +1,5 @@
 class Queries:
+    @staticmethod
     def Check_Authentication():
         Query = """
         query {
@@ -59,7 +60,44 @@ class Queries:
             "perPage": 50
         }
         return Query, Variables
-
+    
+    @staticmethod
+    def Global_Activity_Feed_Query(page):
+        Query = """
+        query ($page: Int, $perPage: Int) {
+            Page (page: $page, perPage: $perPage) {
+                pageInfo {
+                    total
+                    currentPage
+                    lastPage
+                    hasNextPage
+                    perPage
+                }
+                activities(sort: ID_DESC) {
+                    ... on TextActivity {
+                        id
+                        user {
+                            id
+                        }
+                    }
+                    ... on ListActivity {
+                        id
+                        user {
+                            id
+                        }
+                    }
+                    ... on MessageActivity {
+                        id
+                    }
+                }
+            }
+        }
+        """
+        Variables = {
+            "page": page,
+            "perPage": 50
+        }
+        return Query, Variables
 class Mutations:
     @staticmethod
     def Follow_Mutation(user_id):

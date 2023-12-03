@@ -161,3 +161,30 @@ def Follow_User(id):
             api_request(query, variables)
     else:
         print(f"Failed to follow user with ID: {id}")
+
+def Get_Global_Activities(pages, total_people_to_follow):
+    page = 1
+    activity_ids = []
+    people_followed = 0
+    following = Get_Following()
+
+    while page <= pages and people_followed < total_people_to_follow:
+        query, variables = QM.Queries.Global_Activity_Feed_Query(page)
+        response = api_request(query, variables)
+        print()
+        
+        # Add the ids to the list and follow the user if they are not following the main user
+        for activity in response['data']['Page']['activities']:
+            activity_ids.append(activity['id'])
+            if activity['user']['id'] not in following and people_followed < total_people_to_follow:
+                Follow_User(activity['user']['id'])
+                following.append(activity['user']['id'])
+                people_followed += 1
+
+        # Print the ids on this page
+        print(f"\nPage {page} ids: {activity_ids[-len(response['data']['Page']['activities']):]}")
+
+        # Go to the next page
+        page += 1
+
+    return activity_ids

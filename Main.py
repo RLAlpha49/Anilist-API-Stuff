@@ -31,7 +31,7 @@ class Main():
                 RequestAPI.Set_Access_Token()
                 refresh = RequestAPI.Check_Access_Token()
         while True:
-            option = input("\n0. Exit\n1. Get Users Not Following Back\n2. Get Users You Are Not Following Back\nOption: ")
+            option = input("\n0. Exit\n1. Get Users Not Following Back\n2. Get Users You Are Not Following Back\n3. Follow Random Users From Global Activity Feed\nOption: ")
             if option == '0':
                 break
             elif option == '1':
@@ -134,6 +134,14 @@ class Main():
                         print("Followed all users not followed.")
                 else:
                     print("\nYou are following all your followers.")
+            elif option == '3':
+                print()
+                RequestAPI.Get_User_ID()
+                total_people_to_follow = int(input("Enter the number of people you would like to follow: "))
+                pages = total_people_to_follow // 50  # Each page contains 50 activities
+                if pages < 1:
+                    pages = 1
+                RequestAPI.Get_Global_Activities(pages, total_people_to_follow)
                 
         
 if __name__ == '__main__':
