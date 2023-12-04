@@ -139,10 +139,7 @@ class Main():
                 print()
                 RequestAPI.Get_User_ID()
                 total_people_to_follow = int(input("Enter the number of people you would like to follow: "))
-                pages = total_people_to_follow // 50  # Each page contains 50 activities
-                if pages < 1:
-                    pages = 1
-                RequestAPI.Get_Global_Activities(pages, total_people_to_follow)
+                RequestAPI.Get_Global_Activities(total_people_to_follow)
             elif option == '4':
                 print()
                 RequestAPI.Get_User_ID()

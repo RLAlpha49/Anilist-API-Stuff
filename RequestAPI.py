@@ -3,6 +3,7 @@ from API import Get_Access_Token
 import QueriesAndMutations as QM
 import requests
 import time
+import random
 
 # Define the API endpoint
 url = 'https://graphql.anilist.co'
@@ -168,13 +169,13 @@ def Follow_User(id):
     else:
         print(f"Failed to follow user with ID: {id}")
 
-def Get_Global_Activities(pages, total_people_to_follow):
+def Get_Global_Activities(total_people_to_follow):
     page = 1
     activity_ids = []
     people_followed = 0
     following = Get_Following()
 
-    while page <= pages and people_followed < total_people_to_follow:
+    while people_followed < total_people_to_follow:
         query, variables = QM.Queries.Global_Activity_Feed_Query(page)
         response = api_request(query, variables)
         print()
@@ -226,6 +227,10 @@ def Like_Activities(total_activities_to_like, include_message_activity):
                     Like_Activity(activity['id'])
                     print(f"Liked activity with ID: {activity['id']} from user with ID: {following_user_id}")
                     activities_liked += 1
+
+                    # Wait a random time between 0 and 1.5 seconds
+                    # This is to avoid rate limiting and to not flood the API with requests
+                    time.sleep(random.uniform(0, 1.5))
 
             # If there are no more activities, break the loop
             if not response['data']['Page']['activities']:
