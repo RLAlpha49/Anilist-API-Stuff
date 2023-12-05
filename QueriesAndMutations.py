@@ -12,54 +12,39 @@ class Queries:
         return Query
     
     @staticmethod
-    def Follower_Query(user_id, page):
-        Query = """
-        query ($userId: Int!, $page: Int, $perPage: Int) {
-            Page (page: $page, perPage: $perPage) {
-                pageInfo {
+    def create_page_query(query_name):
+        return f"""
+        query ($userId: Int!, $page: Int, $perPage: Int) {{
+            Page (page: $page, perPage: $perPage) {{
+                pageInfo {{
                     total
                     currentPage
                     lastPage
                     hasNextPage
                     perPage
-                }
-                followers(userId: $userId) {
+                }}
+                {query_name}(userId: $userId) {{
                     id
-                }
-            }
-        }
+                }}
+            }}
+        }}
         """
-        Variables = {
+
+    @staticmethod
+    def create_variables(user_id, page):
+        return {
             "userId": user_id,
             "page": page,
             "perPage": 50
         }
-        return Query, Variables
-    
+
+    @staticmethod
+    def Follower_Query(user_id, page):
+        return Queries.create_page_query('followers'), Queries.create_variables(user_id, page)
+
     @staticmethod
     def Following_Query(user_id, page):
-        Query = """
-        query ($userId: Int!, $page: Int, $perPage: Int) {
-            Page (page: $page, perPage: $perPage) {
-                pageInfo {
-                    total
-                    currentPage
-                    lastPage
-                    hasNextPage
-                    perPage
-                }
-                following(userId: $userId) {
-                    id
-                }
-            }
-        }
-        """
-        Variables = {
-            "userId": user_id,
-            "page": page,
-            "perPage": 50
-        }
-        return Query, Variables
+        return Queries.create_page_query('following'), Queries.create_variables(user_id, page)
     
     @staticmethod
     def Global_Activity_Feed_Query(page):
