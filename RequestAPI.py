@@ -182,10 +182,6 @@ def Like_Activities(total_activities_to_like, include_message_activity, user_lis
                     activities_liked += 1
                     total_likes += 1
 
-                    # Wait a random time between 0 and 1 seconds
-                    # This is to avoid rate limiting and to not flood the API with requests
-                    time.sleep(random.uniform(0, 1))
-
             # If there are no more activities, break the loop
             if not response['data']['Page']['activities']:
                 break
