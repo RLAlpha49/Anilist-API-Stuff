@@ -30,9 +30,9 @@ class Main():
                 Config.save_config(config, 'config.json')
                 RequestAPI.Set_Access_Token()
                 refresh = RequestAPI.Check_Access_Token()
-        print('Notice: Anilist will rate limit often, so please be patient when using this program. (Most times it rate limites a specific feature so you should be able to use other features.)')
+        print('Notice: Anilist will rate limit often, so please be patient when using this program. (Most times it rate limites a specific feature so you should be able to use other features on the site while this is running.)')
         while True:
-            option = input("\n0. Exit\n1. Get Users Not Following Back\n2. Get Users You Are Not Following Back\n3. Follow Random Users From Global Activity Feed\n4. Like Followed Users Activity\nOption: ")
+            option = input("\n0. Exit\n1. Get Users Not Following Back\n2. Get Users You Are Not Following Back\n3. Follow Random Users From Global Activity Feed\n4. Like Users Activity\nOption: ")
             if option == '0':
                 break
             elif option == '1':
@@ -143,10 +143,26 @@ class Main():
             elif option == '4':
                 print()
                 RequestAPI.Get_User_ID()
+                choice = input("Do you want to enter a list of users, use the whole follower list, or only followers who follow you back? (Enter 'list', 'followers', or 'mutual'): ").lower()
+                if choice == 'list':
+                    user_input = input("Enter a comma-separated list of user IDs or usernames (e.g., 12345, 67890, username1, username2): ")
+                    user_list = user_input.split(',')
+                    for i, user in enumerate(user_list):
+                        user = user.strip()
+                        if not user.isdigit():
+                            user_list[i] = RequestAPI.Get_User_ID_From_Username(user)
+                        else:
+                            user_list[i] = int(user)
+                    print(f"\nUsers to be processed: {user_list}\n")
+                elif choice == 'mutual':
+                    user_list = RequestAPI.Get_Mutual_Followers()
+                    print(f"\nUsers to be processed: {user_list}\n")
+                elif choice == 'followers':
+                    user_list = None
                 total_activities_to_like = int(input("Enter the number of activities you would like to like per followed user: "))
                 include_message_activity = input("Do you want to like message activities? - Messages sent to the user are considered that users activity. (y/n): ").lower() == 'y'
                 print()
-                RequestAPI.Like_Activities(total_activities_to_like, include_message_activity)
+                RequestAPI.Like_Activities(total_activities_to_like, include_message_activity, user_list)
                 
         
 if __name__ == '__main__':

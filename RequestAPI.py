@@ -41,7 +41,7 @@ def api_request(query, variables=None):
 
     # If the rate limit is close to being hit, print a warning
     elif rate_limit_remaining < 5:
-        print(f"\nWarning: Only {rate_limit_remaining} requests remaining until rate limit reset.")
+        print(f"Warning: Only {rate_limit_remaining} requests remaining until rate limit reset.")
 
     # If the request was successful, return the JSON response
     if response.status_code == 200:
@@ -96,6 +96,15 @@ def Get_User_ID():
     response = api_request(query)
     user_id = response['data']['Viewer']['id']
     return response['data']['Viewer']['id']
+
+def Get_User_ID_From_Username(username):
+    query, variables = QM.Queries.Get_User_ID_Query(username)
+    response = api_request(query, variables)
+    if response['data']['User'] is not None:
+        return response['data']['User']['id']
+    else:
+        print(f"Error: User {username} not found")
+        return None
 
 def Get_Followers():
     page = 1
@@ -182,11 +191,13 @@ def Get_Global_Activities(total_people_to_follow):
         
         # Add the ids to the list and follow the user if they are not following the main user
         for activity in response['data']['Page']['activities']:
-            activity_ids.append(activity['id'])
-            if activity['user']['id'] not in following and people_followed < total_people_to_follow:
-                Follow_User(activity['user']['id'])
-                following.append(activity['user']['id'])
-                people_followed += 1
+            if 'user' in activity:
+                activity_ids.append(activity['id'])
+                user_id = activity['user']['id']
+                if user_id not in following and people_followed < total_people_to_follow:
+                    Follow_User(user_id)
+                    following.append(user_id)
+                    people_followed += 1
 
         # Print the ids on this page
         print(f"\nPage {page} ids: {activity_ids[-len(response['data']['Page']['activities']):]}")
@@ -208,29 +219,31 @@ def Like_Activity(id):
     else:
         print(f"Failed to like activity with ID: {id}")
 
-def Like_Activities(total_activities_to_like, include_message_activity):
-    activities_liked = 0
-    following_users = Get_Following()
-    print()
+def Like_Activities(total_activities_to_like, include_message_activity, user_list=None):
+    if user_list is None:
+        user_list = Get_Following()
+    expected_likes = total_activities_to_like * len(user_list)
+    print(f"Expected number of likes: {expected_likes}\n")
+    total_likes = 0
 
-    for following_user_id in following_users:
+    for user_id in user_list:
         page = 1
         activities_liked = 0
-        print()
         while activities_liked < total_activities_to_like:
-            query, variables = QM.Queries.User_Activity_Feed_Query(following_user_id, page, include_message_activity)
+            query, variables = QM.Queries.User_Activity_Feed_Query(user_id, page, include_message_activity)
             response = api_request(query, variables)
 
             # Like the activity if it was not liked before
             for activity in response['data']['Page']['activities']:
                 if activity and 'isLiked' in activity and not activity['isLiked'] and activities_liked < total_activities_to_like:
                     Like_Activity(activity['id'])
-                    print(f"Liked activity with ID: {activity['id']} from user with ID: {following_user_id}")
+                    print(f"Liked activity with ID: {activity['id']} from user with ID: {user_id}")
                     activities_liked += 1
+                    total_likes += 1
 
-                    # Wait a random time between 0 and 1.5 seconds
+                    # Wait a random time between 0 and 1 seconds
                     # This is to avoid rate limiting and to not flood the API with requests
-                    time.sleep(random.uniform(0, 1.5))
+                    time.sleep(random.uniform(0, 1))
 
             # If there are no more activities, break the loop
             if not response['data']['Page']['activities']:
@@ -238,3 +251,22 @@ def Like_Activities(total_activities_to_like, include_message_activity):
 
             # Go to the next page
             page += 1
+
+        print()  # Print a line after each user's activities have been processed
+
+    print(f"\nTotal number of likes: {total_likes}")
+
+def Get_Mutual_Followers():
+    followers = Get_Followers()
+    print()
+    following = Get_Following()
+    print()
+
+    # Convert the lists to sets for easier comparison
+    followers_set = set(followers)
+    following_set = set(following)
+
+    # Find the users that are both in your followers and following lists
+    mutual_followers = followers_set & following_set
+
+    return list(mutual_followers)

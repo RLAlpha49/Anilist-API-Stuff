@@ -98,6 +98,20 @@ class Queries:
             "perPage": 50
         }
         return Query, Variables
+    
+    @staticmethod
+    def Get_User_ID_Query(username):
+        Query = """
+        query ($name: String) {
+            User(name: $name) {
+                id
+            }
+        }
+        """
+        Variables = {
+            "name": username
+        }
+        return Query, Variables
 
     @staticmethod
     def User_Activity_Feed_Query(userId, page, include_message_activity):
