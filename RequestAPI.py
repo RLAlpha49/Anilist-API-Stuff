@@ -130,11 +130,11 @@ def Get_Global_Activities(total_people_to_follow):
     page = 1
     people_followed = 0
     following = Get_Following()
+    print()
 
     while people_followed < total_people_to_follow:
         query, variables = QM.Queries.Global_Activity_Feed_Query(page)
         response = api_request(query, variables)
-        print()
 
         # Add the ids to the list and follow the user if they are not following the main user
         activity_ids = (activity['id'] for activity in response['data']['Page']['activities'] if 'user' in activity)

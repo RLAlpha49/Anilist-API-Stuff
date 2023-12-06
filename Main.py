@@ -49,6 +49,7 @@ class Main():
                 # Exclude certain users from the list
                 excluded_ids = list(Config.load_excluded_ids())
                 not_following_back -= set(excluded_ids)
+                old_not_following_back = not_following_back
                 
                 if not_following_back:
                     # Print the number of followers, following, and not following back
@@ -97,8 +98,11 @@ class Main():
                     # Save the excluded ids
                     Config.save_excluded_ids(set(excluded_ids))
 
-                    # Print the new list of not following back
-                    print(f"\nNew List:\n{list(not_following_back)}")
+                    # Compare and print
+                    if old_not_following_back != not_following_back:
+                        print(f"\nNew List:\n{list(not_following_back)}")
+                    else:
+                        print("\nThe list has not changed.")
 
                     # Ask the user if they want to unfollow these users
                     if input("\nWould you like to unfollow these users? (y/n): ") == 'y':
@@ -132,7 +136,7 @@ class Main():
                     if input("Would you like to follow these users? (y/n): ") == 'y':
                         for id in not_following:
                             RequestAPI.Follow_User(id)
-                        print("Followed all users not followed.")
+                        print("\nFollowed all users not followed.")
                 else:
                     print("\nYou are following all your followers.")
             elif option == '3':
