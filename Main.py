@@ -102,14 +102,15 @@ class Main():
 
                     # Ask the user if they want to unfollow these users
                     if input("\nWould you like to unfollow these users? (y/n): ") == 'y':
+                        print()
                         # Unfollow each user in the list
                         for id in not_following_back:
                             RequestAPI.Unfollow_User(id)
                         # Print a confirmation message
-                        print("Unfollowed all users not following back.")
+                        print("\nUnfollowed all users not following back.")
                 else:
                     # Print a message indicating that there are no followers to follow
-                    print("No Followers Not Following Back.")
+                    print("\nNo Followers Not Following Back.")
             elif option == '2':
                 # Fetch user's followers and following lists
                 print()
@@ -164,7 +165,7 @@ class Main():
                     user_list = None
 
                 # Get the number of activities to like per followed user and whether to include message activities
-                total_activities_to_like = int(input("Enter the number of activities you would like to like per followed user: "))
+                total_activities_to_like = int(input("Enter the number of activities you would like to like per user: "))
                 include_message_activity = input("Do you want to like message activities? - Messages sent to the user are considered that users activity. (y/n): ").lower() == 'y'
 
                 print()

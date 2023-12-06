@@ -3,7 +3,6 @@ import QueriesAndMutations as QM
 import Config
 import requests
 import time
-import random
 import operator
 
 
@@ -18,7 +17,7 @@ def handle_rate_limit(response):
         wait_time = rate_limit_reset - int(time.time())
         if wait_time < 0:
             wait_time = 60
-        print(f"\nRate limit hit. Waiting for {wait_time} seconds.")
+        print(f"\nRate limit hit. Waiting for {wait_time} seconds.\n")
         time.sleep(wait_time)
     elif rate_limit_remaining < 5:
         print(f"Warning: Only {rate_limit_remaining} requests remaining until rate limit reset.")
@@ -26,6 +25,7 @@ def handle_rate_limit(response):
 def api_request(query, variables=None):
     response = requests.post(url, json={'query': query, 'variables': variables}, headers=headers)
     handle_rate_limit(response)
+    #print(response.json())
     if response.status_code == 200:
         return response.json()
     elif response.status_code == 429:
@@ -153,17 +153,17 @@ def Get_Global_Activities(total_people_to_follow):
 def Like_Activity(id):
     query, variables = QM.Mutations.Like_Mutation(id)
     response = api_request(query, variables)
-    if response is not None:
-        if id in [item['id'] for item in response['data']['ToggleLike']]:
-            print(f"Liked activity with ID: {id}")
+    if response is not None and 'errors' not in response:
+        return True
     else:
         print(f"Failed to like activity with ID: {id}")
+        return False
 
 def Like_Activities(total_activities_to_like, include_message_activity, user_list=None):
     if user_list is None:
         user_list = Get_Following()
     expected_likes = total_activities_to_like * len(user_list)
-    print(f"Expected number of likes: {expected_likes}\n")
+    print(f"\nExpected number of likes: {expected_likes}\n")
     total_likes = 0
 
     for user_id in user_list:
@@ -177,10 +177,11 @@ def Like_Activities(total_activities_to_like, include_message_activity, user_lis
             activities = (activity for activity in response['data']['Page']['activities'] if activity and 'isLiked' in activity and not activity['isLiked'])
             for activity in activities:
                 if activities_liked < total_activities_to_like:
-                    Like_Activity(activity['id'])
-                    print(f"Liked activity with ID: {activity['id']} from user with ID: {user_id}")
-                    activities_liked += 1
-                    total_likes += 1
+                    activity_liked = Like_Activity(activity['id'])
+                    if activity_liked:
+                        print(f"Liked activity with ID: {activity['id']} from user with ID: {user_id}")
+                        activities_liked += 1
+                        total_likes += 1
 
             # If there are no more activities, break the loop
             if not response['data']['Page']['activities']:
@@ -191,12 +192,12 @@ def Like_Activities(total_activities_to_like, include_message_activity, user_lis
 
         print()  # Print a line after each user's activities have been processed
 
-    print(f"\nTotal number of likes: {total_likes}")
+    print(f"\nExpected number of likes: {expected_likes}")
+    print(f"Total number of likes: {total_likes}")
 
 def Compare_Followers(followers, following, operation):
-    followers_set = set(followers)
-    following_set = set(following)
-    return list(operation(followers_set, following_set))
+    result = operation(set(following), set(followers))
+    return list(result)
 
 def Get_Mutual_Followers():
     followers = Get_Followers()
