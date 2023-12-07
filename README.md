@@ -14,17 +14,23 @@ This program is a utility for interacting with the Anilist API. It provides seve
 This feature retrieves a list of users that you are following but who are not following you back. 
 - Option to exclude certain users from this list.
 - Option to unfollow these users.
+- Displays the number of followers, following, excluded IDs, and users not following back.
 
 ### Get Users You Are Not Following Back
 This feature retrieves a list of users who are following you, but you are not following back. 
 - Option to follow these users.
+- Displays the number of followers, following, and users you are not following back.
 
 ### Follow Random Users From Global Activity Feed
 This feature allows you to follow a specified number of random users from the global activity feed.
+- Displays the number of people you would like to follow.
 
 ### Like Followed Users Activity
 This feature allows you to like a specified number of activities from each user you are following. 
 - Option to include message activities.
+- Option to enter a list of users, use the whole follower list, only followers who follow you back, or users who do not follow you back.
+- Displays the number of activities you would like to like per user.
+- Gives total values for likes, etc.
 
 ## Installation
  - The `AnilistFollwerAndLikingTool.exe` file requires no prerequisites. Just run it.
