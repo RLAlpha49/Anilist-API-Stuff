@@ -166,6 +166,13 @@ def Like_Activities(total_activities_to_like, include_message_activity, user_lis
     print(f"\nExpected number of likes: {expected_likes}\n")
     total_likes = 0
 
+    # Add counters
+    no_activities_users = 0
+    failed_requests = 0
+
+    # Add list for users with no more activities
+    no_activities_user_ids = []
+
     for user_id in user_list:
         page = 1
         activities_liked = 0
@@ -173,8 +180,13 @@ def Like_Activities(total_activities_to_like, include_message_activity, user_lis
             query, variables = QM.Queries.User_Activity_Feed_Query(user_id, page, include_message_activity)
             response = api_request(query, variables)
 
+            if response is None:
+                failed_requests += 1
+                break
+
             # Like the activity if it was not liked before
-            activities = (activity for activity in response['data']['Page']['activities'] if activity and 'isLiked' in activity and not activity['isLiked'])
+            activities = [activity for activity in response['data']['Page']['activities'] if activity and 'isLiked' in activity and not activity['isLiked']]
+
             for activity in activities:
                 if activities_liked < total_activities_to_like:
                     activity_liked = Like_Activity(activity['id'])
@@ -182,18 +194,28 @@ def Like_Activities(total_activities_to_like, include_message_activity, user_lis
                         print(f"Liked activity with ID: {activity['id']} from user with ID: {user_id}")
                         activities_liked += 1
                         total_likes += 1
+                    else:
+                        print(f"Error: Activity with ID: {activity['id']}")
+                        failed_requests += 1
 
             # If there are no more activities, break the loop
             if not response['data']['Page']['activities']:
+                if not activities:
+                    no_activities_users += 1
+                    no_activities_user_ids.append(user_id)
                 break
 
             # Go to the next page
             page += 1
-
-        print()  # Print a line after each user's activities have been processed
+            
+        if total_activities_to_like > 1:
+            print()  # Print a line after each user's activities have been processed
 
     print(f"\nExpected number of likes: {expected_likes}")
     print(f"Total number of likes: {total_likes}")
+    print(f"Users with no activities to like: {no_activities_users}")
+    print(f"Failed requests: {failed_requests}")
+    print(f"User IDs with no more activities: {no_activities_user_ids}")
 
 def Compare_Followers(followers, following, operation):
     result = operation(set(following), set(followers))
