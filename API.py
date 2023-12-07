@@ -1,7 +1,6 @@
 # Import necessary modules
 import webbrowser
 import os
-import time
 import platform
 
 # Define the authorization URL for AniList OAuth

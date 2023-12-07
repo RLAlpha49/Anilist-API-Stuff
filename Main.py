@@ -1,7 +1,7 @@
+# Import necessary modules
 import Config
 from API import Get_Access_Token
 import RequestAPI
-import os
 
 class Main():
     def __init__(self):
@@ -55,6 +55,7 @@ class Main():
                     # Print the number of followers, following, and not following back
                     print(f"\nNumber of Followers: {len(followers)}")
                     print(f"Number of Following: {len(following)}")
+                    print(f"Number of Excluded IDs: {len(excluded_ids)}")
                     print(f"Number of Following Not Following Back: {len(not_following_back)}")
                     print(f"\nList of ID's:\n{list(not_following_back)}\n")
 
