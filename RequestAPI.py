@@ -5,6 +5,7 @@ import Config
 import requests
 import time
 import operator
+import keyboard
 
 
 # Define the API endpoint
@@ -192,7 +193,7 @@ def Like_Activities(total_activities_to_like, include_message_activity, user_lis
                 if activities_liked < total_activities_to_like:
                     activity_liked = Like_Activity(activity['id'])
                     if activity_liked:
-                        print(f"Liked activity with ID: {activity['id']} from user with ID: {user_id}")
+                        print(f"Liked activity with ID: {activity['id']}, User ID: {user_id}")
                         activities_liked += 1
                         total_likes += 1
                     else:
@@ -235,3 +236,64 @@ def Get_Not_Followed_Followers():
     following = Get_Following()
     print()
     return Compare_Followers(followers, following, operator.sub)
+
+def Like_Activities_For_Five_Minutes(refresh_interval):
+    page = 1
+    start_time = time.time()
+    stop = False
+    total_likes = 0
+    failed_requests = 0
+    already_liked = 0
+
+    def set_stop(e):
+        nonlocal stop
+        stop = True
+
+    keyboard.on_press_key('F12', set_stop)
+
+    while not stop:  # Run until 'q' is pressed
+        if page == 101:
+            print("Page limit reached. Resetting page to 1.")
+            page = 1
+        # Get the following activity feed
+        query, variables = QM.Queries.Following_Activity_Feed_Query(page)
+        response = api_request(query, variables)
+        following_activity_feed = response['data']['Page']['activities']
+        print(f"\nChecking Page {page} for following activity feed")
+
+        for activity in following_activity_feed:
+            if activity['isLiked']:
+                #print(f"Activity is already liked, skipping...")
+                already_liked += 1
+                continue  # Skip this iteration and move to the next activity
+
+            user_id = activity['user']['id'] if 'user' in activity else activity['messengerId']
+            activity_liked = Like_Activity(activity['id'])
+            if activity_liked:
+                print(f"Liked activity with ID: {activity['id']}, User ID: {user_id}")
+                total_likes += 1
+            else:
+                print(f"Error: Activity with ID: {activity['id']}, User ID: {user_id}")
+                failed_requests += 1
+
+            # Check if 'q' has been pressed
+            if stop:
+                break  # Break out of the for loop
+
+        # Check if 'q' has been pressed
+        if stop:
+            break  # Break out of the while loop
+
+        page += 1
+
+        # Refresh the following activity feed every refresh_interval minutes
+        if time.time() - start_time >= refresh_interval * 60:
+            print(f"Refreshing following activity feed after {refresh_interval} minutes")
+            start_time = time.time()  # Reset the start time
+            page = 1  # Go to the beginning activity feed
+
+    print(f"\nTotal likes: {total_likes}")
+    print(f"Activities already liked: {already_liked}")
+    print(f"Failed requests: {failed_requests}")
+
+    keyboard.unhook_all()

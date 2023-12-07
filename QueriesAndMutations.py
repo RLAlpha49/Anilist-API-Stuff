@@ -85,6 +85,49 @@ class Queries:
         return Query, Variables
     
     @staticmethod
+    def Following_Activity_Feed_Query(page):
+        Query = """
+        query ($page: Int, $perPage: Int, $isFollowing: Boolean) {
+            Page (page: $page, perPage: $perPage) {
+                pageInfo {
+                    total
+                    currentPage
+                    lastPage
+                    hasNextPage
+                    perPage
+                }
+                activities(sort: ID_DESC, isFollowing: $isFollowing) {
+                    ... on TextActivity {
+                        id
+                        isLiked
+                        user {
+                            id
+                        }
+                    }
+                    ... on ListActivity {
+                        id
+                        isLiked
+                        user {
+                            id
+                        }
+                    }
+                    ... on MessageActivity {
+                        id
+                        isLiked
+                        messengerId
+                    }
+                }
+            }
+        }
+        """
+        Variables = {
+            "page": page,
+            "perPage": 50,
+            "isFollowing": True
+        }
+        return Query, Variables
+    
+    @staticmethod
     def Get_User_ID_Query(username):
         Query = """
         query ($name: String) {

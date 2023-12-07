@@ -2,6 +2,7 @@
 import Config
 from API import Get_Access_Token
 import RequestAPI
+import asyncio
 
 class Main():
     def __init__(self):
@@ -33,7 +34,7 @@ class Main():
 
         print('Notice: Anilist will rate limit often, so please be patient when using this program. (Most times it rate limites a specific feature so you should be able to use other features on the site while this is running.)')
         while True:
-            option = input("\n0. Exit\n1. Get Users Not Following Back\n2. Get Users You Are Not Following Back\n3. Follow Random Users From Global Activity Feed\n4. Like Users Activity\nOption: ")
+            option = input("\n0. Exit\n1. Get Users Not Following Back\n2. Get Users You Are Not Following Back\n3. Follow Random Users From Global Activity Feed\n4. Like Users Activity\n5. Like Following Feed\nOption: ")
             if option == '0':
                 break
             elif option == '1':
@@ -176,6 +177,16 @@ class Main():
                 print()
                 # Call the function to like activities
                 RequestAPI.Like_Activities(total_activities_to_like, include_message_activity, user_list)
-                
+            elif option == '5':
+                print()
+                # Get the current user's ID
+                RequestAPI.Get_User_ID()
+
+                print(f"Press the 'F12' key to stop liking activities. (There may be a slight delay before the program stops)\n")
+                # Ask the user for the refresh interval
+                refresh_interval = int(input("Enter the refresh interval in minutes (Give it some time, Anilist rate limits how fast you can get pages of activities): "))
+
+                # Call the function to like activities
+                RequestAPI.Like_Activities_For_Five_Minutes(refresh_interval)
 if __name__ == '__main__':
     Main()

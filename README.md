@@ -19,10 +19,11 @@ This feature retrieves a list of users that you are following but who are not fo
 - Option to exclude certain users from this list.
 - Option to unfollow these users.
 - Displays the number of followers, following, excluded IDs, and users not following back.
+- Allows you to add or edit excluded IDs.
 
 ### Get Users You Are Not Following Back
 
-This feature retrieves a list of users who are following you, but you are not following back. 
+This feature retrieves a list of users who are following you, but you are not following back.
 
 - Option to follow these users.
 - Displays the number of followers, following, and users you are not following back.
@@ -35,12 +36,20 @@ This feature allows you to follow a specified number of random users from the gl
 
 ### Like Followed Users Activity
 
-This feature allows you to like a specified number of activities from each user you are following. 
+This feature allows you to like a specified number of activities from each user you are following.
 
 - Option to include message activities.
 - Option to enter a list of users, use the whole follower list, only followers who follow you back, or users who do not follow you back.
 - Displays the number of activities you would like to like per user.
 - Gives total values for likes, etc.
+
+### Like Following Feed
+
+This feature allows you to like activities from your following feed.
+
+- Can run endlessly
+- Option to stop liking activities by pressing the 'F12' key.
+- Option to set how often the feed should refresh in minutes.
 
 ## Installation
 
