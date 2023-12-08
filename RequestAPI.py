@@ -132,6 +132,7 @@ def Get_Global_Activities(total_people_to_follow):
     page = 1
     people_followed = 0
     following = Get_Following()
+    unfollowed_ids = Config.load_unfollowed_ids()
     print()
 
     while people_followed < total_people_to_follow:
@@ -142,7 +143,7 @@ def Get_Global_Activities(total_people_to_follow):
         activity_ids = (activity['id'] for activity in response['data']['Page']['activities'] if 'user' in activity)
         for activity_id in activity_ids:
             user_id = next((activity['user']['id'] for activity in response['data']['Page']['activities'] if activity['id'] == activity_id), None)
-            if user_id and user_id not in following and people_followed < total_people_to_follow:
+            if user_id and user_id not in following and user_id not in unfollowed_ids and people_followed < total_people_to_follow:
                 Follow_User(user_id)
                 following.append(user_id)
                 people_followed += 1
@@ -174,6 +175,9 @@ def Like_Activities(total_activities_to_like, include_message_activity, user_lis
 
     # Add list for users with no more activities
     no_activities_user_ids = []
+    
+    # Get Viewer ID
+    viewer_ID = Get_User_ID()
 
     for user_id in user_list:
         page = 1
@@ -186,8 +190,8 @@ def Like_Activities(total_activities_to_like, include_message_activity, user_lis
                 failed_requests += 1
                 break
 
-            # Like the activity if it was not liked before
-            activities = [activity for activity in response['data']['Page']['activities'] if activity and 'isLiked' in activity and not activity['isLiked']]
+            # Like the activity if it was not liked before and the activity's user ID is not the viewer's ID
+            activities = [activity for activity in response['data']['Page']['activities'] if activity and 'isLiked' in activity and not activity['isLiked'] and activity['user']['id'] != viewer_ID]
 
             for activity in activities:
                 if activities_liked < total_activities_to_like:
@@ -237,13 +241,15 @@ def Get_Not_Followed_Followers():
     print()
     return Compare_Followers(followers, following, operator.sub)
 
-def Like_Activities_For_Five_Minutes(refresh_interval, total_pages):
+def Like_Following_Activities(refresh_interval, total_pages):
     page = 1
     start_time = time.time()
     stop = False
     total_likes = 0
     failed_requests = 0
     already_liked = 0
+    
+    viewer_ID = Get_User_ID()
 
     def set_stop(e):
         nonlocal stop
@@ -273,13 +279,16 @@ def Like_Activities_For_Five_Minutes(refresh_interval, total_pages):
                 continue  # Skip this iteration and move to the next activity
 
             user_id = activity['user']['id'] if 'user' in activity else activity['messengerId']
-            activity_liked = Like_Activity(activity['id'])
-            if activity_liked:
-                print(f"Liked activity with ID: {activity['id']}, User ID: {user_id}")
-                total_likes += 1
+            if user_id != viewer_ID:
+                activity_liked = Like_Activity(activity['id'])
+                if activity_liked:
+                    print(f"Liked activity with ID: {activity['id']}, User ID: {user_id}")
+                    total_likes += 1
+                else:
+                    print(f"Error: Activity with ID: {activity['id']}, User ID: {user_id}\n")
+                    failed_requests += 1
             else:
-                print(f"Error: Activity with ID: {activity['id']}, User ID: {user_id}")
-                failed_requests += 1
+                print(f"\nActivity is from the viewer, skipping...\n")
 
             # Check if 'F12' has been pressed
             if stop:

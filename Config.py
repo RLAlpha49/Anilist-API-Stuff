@@ -46,3 +46,12 @@ def load_excluded_ids():
 # Function to save a set of excluded IDs to a file
 def save_excluded_ids(excluded_ids):
     save_json(list(excluded_ids), 'excluded_ids.json')
+    
+# Function to load a set of unfollowed IDs from a file
+def load_unfollowed_ids():
+    unfollowed_ids = load_json('unfollowed_ids.json')
+    return set(unfollowed_ids) if unfollowed_ids is not None else set()
+
+# Function to save a set of unfollowed IDs to a file
+def save_unfollowed_ids(unfollowed_ids):
+    save_json(list(unfollowed_ids), 'unfollowed_ids.json')

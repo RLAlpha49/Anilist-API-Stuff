@@ -52,6 +52,9 @@ class Main():
                 not_following_back -= set(excluded_ids)
                 old_not_following_back = not_following_back
                 
+                # Load the list of unfollowed users
+                unfollowed_ids = list(Config.load_unfollowed_ids())
+                
                 if not_following_back:
                     # Print the number of followers, following, and not following back
                     print(f"\nNumber of Followers: {len(followers)}")
@@ -79,7 +82,7 @@ class Main():
                             # Add a new id to the excluded ids
                             new_id = input("Enter the new ID to add: ")
                             excluded_ids.append(int(new_id))
-                        else:
+                        elif edit_id.lower() != 'done':
                             # Edit the specified id
                             edit_id = int(edit_id) - 1  # Subtract 1 because the list is 0-indexed
                             if 0 <= edit_id < len(excluded_ids):
@@ -112,8 +115,14 @@ class Main():
                         # Unfollow each user in the list
                         for id in not_following_back:
                             RequestAPI.Unfollow_User(id)
+                            # Add the user to the list of unfollowed users
+                            unfollowed_ids.append(id)
                         # Print a confirmation message
                         print("\nUnfollowed all users not following back.")
+
+                        if input("\nWould you like to save the ID's of the unfollowed users so they are not followed again? (y/n): ") == 'y':
+                            # Save the list of unfollowed users
+                            Config.save_unfollowed_ids(set(unfollowed_ids))
                 else:
                     # Print a message indicating that there are no followers to follow
                     print("\nNo Followers Not Following Back.")
@@ -188,6 +197,6 @@ class Main():
                 total_pages = int(input("Enter the number of pages to like activities from (Max 100): "))
 
                 # Call the function to like activities
-                RequestAPI.Like_Activities_For_Five_Minutes(refresh_interval, total_pages)
+                RequestAPI.Like_Following_Activities(refresh_interval, total_pages)
 if __name__ == '__main__':
     Main()
