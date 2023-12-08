@@ -73,6 +73,7 @@ class Queries:
                     }
                     ... on MessageActivity {
                         id
+                        messengerId
                     }
                 }
             }

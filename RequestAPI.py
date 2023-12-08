@@ -237,7 +237,7 @@ def Get_Not_Followed_Followers():
     print()
     return Compare_Followers(followers, following, operator.sub)
 
-def Like_Activities_For_Five_Minutes(refresh_interval):
+def Like_Activities_For_Five_Minutes(refresh_interval, total_pages):
     page = 1
     start_time = time.time()
     stop = False
@@ -251,10 +251,15 @@ def Like_Activities_For_Five_Minutes(refresh_interval):
 
     keyboard.on_press_key('F12', set_stop)
 
-    while not stop:  # Run until 'q' is pressed
-        if page == 101:
-            print("Page limit reached. Resetting page to 1.")
+    while not stop:  # Run until 'F12' is pressed
+        if page == total_pages + 1:
+            print("\nPage limit reached. Resetting to page 1.")
+            # Sleep for 5 seconds before resetting the page
+            # Mostly for if total_pages is a low number and to stop the script from running too fast
+            time.sleep(5)
             page = 1
+            start_time = time.time()  # Reset the start time
+        
         # Get the following activity feed
         query, variables = QM.Queries.Following_Activity_Feed_Query(page)
         response = api_request(query, variables)
@@ -276,11 +281,11 @@ def Like_Activities_For_Five_Minutes(refresh_interval):
                 print(f"Error: Activity with ID: {activity['id']}, User ID: {user_id}")
                 failed_requests += 1
 
-            # Check if 'q' has been pressed
+            # Check if 'F12' has been pressed
             if stop:
                 break  # Break out of the for loop
 
-        # Check if 'q' has been pressed
+        # Check if 'F12' has been pressed
         if stop:
             break  # Break out of the while loop
 
@@ -288,12 +293,12 @@ def Like_Activities_For_Five_Minutes(refresh_interval):
 
         # Refresh the following activity feed every refresh_interval minutes
         if time.time() - start_time >= refresh_interval * 60:
-            print(f"Refreshing following activity feed after {refresh_interval} minutes")
+            print(f"\nRefreshing following activity feed after {refresh_interval} minutes")
             start_time = time.time()  # Reset the start time
             page = 1  # Go to the beginning activity feed
 
     print(f"\nTotal likes: {total_likes}")
-    print(f"Activities already liked: {already_liked}")
+    print(f"Activities skipped liking: {already_liked}")
     print(f"Failed requests: {failed_requests}")
 
     keyboard.unhook_all()
