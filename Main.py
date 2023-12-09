@@ -2,10 +2,22 @@
 import Config
 from API import Get_Access_Token
 import RequestAPI
-import asyncio
 
 class Main():
     def __init__(self):
+        def get_valid_input(prompt, valid_inputs=None, validation_func=None):
+            while True:
+                user_input = input(prompt)
+                if valid_inputs and user_input in valid_inputs:
+                    return user_input
+                elif validation_func and validation_func(user_input):
+                    return int(user_input)
+                else:
+                    print("Invalid input. Please try again.")
+                    
+        def is_positive_integer(s):
+            return s.isdigit() and int(s) > 0
+        
         # Load configuration and ask for client and secret IDs if not found
         config = Config.load_config('config.json')
         if not config:
@@ -34,7 +46,7 @@ class Main():
 
         print('Notice: Anilist will rate limit often, so please be patient when using this program. (Most times it rate limites a specific feature so you should be able to use other features on the site while this is running.)')
         while True:
-            option = input("\n0. Exit\n1. Get Users Not Following Back\n2. Get Users You Are Not Following Back\n3. Follow Random Users From Global Activity Feed\n4. Like Users Activity\n5. Like Following Feed\nOption: ")
+            option = get_valid_input("\n0. Exit\n1. Get Users Not Following Back\n2. Get Users You Are Not Following Back\n3. Follow Random Users From Global Activity Feed\n4. Like Users Activity\n5. Like Following Feed\nOption: ", ['0', '1', '2', '3', '4', '5'])
             if option == '0':
                 break
             elif option == '1':
@@ -64,36 +76,35 @@ class Main():
                     print(f"\nList of ID's:\n{list(not_following_back)}\n")
 
                     # Ask the user if they want to exclude any ids
-                    action = input("Enter 'add' to exclude an ID, 'edit' to edit excluded IDs, 'done' to finish: ")
-                    if action.lower() == 'add':
+                    action = get_valid_input("Enter 'add' to exclude an ID, 'edit' to edit excluded IDs, 'done' to finish: ", ['add', 'edit', 'done'])
+                    if action == 'add':
                         # Exclude the specified id
-                        exclude_id = input("Enter an ID to exclude: ")
+                        exclude_id = get_valid_input("Enter an ID to exclude: ", validation_func=is_positive_integer)
                         excluded_id = int(exclude_id)
                         not_following_back.discard(excluded_id)
                         excluded_ids.append(excluded_id)
-                    elif action.lower() == 'edit':
+                    elif action == 'edit':
                         # Print the excluded ids in a numbered list
                         for i, id in enumerate(excluded_ids, start=1):
                             print(f"{i}. {id}")
 
                         # Ask the user to edit the excluded ids
-                        edit_id = input("Enter the number of the ID to remove or edit, 'add' to add a new ID, or 'done' to finish: ")
-                        if edit_id.lower() == 'add':
+                        edit_id = get_valid_input("Enter the number of the ID to remove or edit, 'add' to add a new ID, or 'done' to finish: ", list(map(str, range(1, len(excluded_ids) + 1))) + ['add', 'done'])
+                        if edit_id == 'add':
                             # Add a new id to the excluded ids
-                            new_id = input("Enter the new ID to add: ")
+                            new_id = get_valid_input("Enter the new ID to add: ", validation_func=is_positive_integer)
                             excluded_ids.append(int(new_id))
-                        elif edit_id.lower() != 'done':
+                        elif edit_id != 'done':
                             # Edit the specified id
                             edit_id = int(edit_id) - 1  # Subtract 1 because the list is 0-indexed
-                            if 0 <= edit_id < len(excluded_ids):
-                                action = input("Enter 'remove' to remove the ID or 'change' to change it: ")
-                                if action.lower() == 'remove':
-                                    # Remove the specified id
-                                    excluded_ids.pop(edit_id)
-                                elif action.lower() == 'change':
-                                    # Change the specified id
-                                    new_id = input("Enter the new ID: ")
-                                    excluded_ids[edit_id] = int(new_id)
+                            action = get_valid_input("Enter 'remove' to remove the ID or 'change' to change it: ", ['remove', 'change'])
+                            if action == 'remove':
+                                # Remove the specified id
+                                excluded_ids.pop(edit_id)
+                            elif action == 'change':
+                                # Change the specified id
+                                new_id = get_valid_input("Enter the new ID: ", validation_func=is_positive_integer)
+                                excluded_ids[edit_id] = int(new_id)
 
                         # Reprint the list of excluded ids
                         print("\nExcluded IDs:")
@@ -110,7 +121,7 @@ class Main():
                         print("\nThe list has not changed.")
 
                     # Ask the user if they want to unfollow these users
-                    if input("\nWould you like to unfollow these users? (y/n): ") == 'y':
+                    if get_valid_input("\nWould you like to unfollow these users? (y/n): ", ['y', 'n']) == 'y':
                         print()
                         # Unfollow each user in the list
                         for id in not_following_back:
@@ -120,7 +131,7 @@ class Main():
                         # Print a confirmation message
                         print("\nUnfollowed all users not following back.")
 
-                        if input("\nWould you like to save the ID's of the unfollowed users so they are not followed again? (y/n): ") == 'y':
+                        if get_valid_input("\nWould you like to save the ID's of the unfollowed users so they are not followed again? (y/n): ", ['y', 'n']) == 'y':
                             # Save the list of unfollowed users
                             Config.save_unfollowed_ids(set(unfollowed_ids))
                 else:
@@ -144,7 +155,7 @@ class Main():
                     print(f"Number of Followers Not Following Back: {len(not_following)}")
                     print(f"\nList of ID's:\n{list(not_following)}\n")
 
-                    if input("Would you like to follow these users? (y/n): ") == 'y':
+                    if get_valid_input("Would you like to follow these users? (y/n): ", ['y', 'n']) == 'y':
                         for id in not_following:
                             RequestAPI.Follow_User(id)
                         print("\nFollowed all users not followed.")
@@ -154,7 +165,7 @@ class Main():
                 print()
                 # Get the current user's ID
                 RequestAPI.Get_User_ID()
-                total_people_to_follow = int(input("Enter the number of people you would like to follow: "))
+                total_people_to_follow = get_valid_input("Enter the number of people you would like to follow: ", validation_func=is_positive_integer)
                 # Call the function to get global activities of the specified number of people
                 RequestAPI.Get_Global_Activities(total_people_to_follow)
             elif option == '4':
@@ -163,7 +174,7 @@ class Main():
                 RequestAPI.Get_User_ID()
 
                 # Ask the user to choose an option for the list of users
-                choice = input("Do you want to enter a list of users, use the whole follower list, or only followers who follow you back? (Enter 'list', 'followers', 'mutual', or 'not followed'): ").lower()
+                choice = get_valid_input("Do you want to enter a list of users, use the whole follower list, or only followers who follow you back? (Enter 'list', 'followers', 'mutual', or 'not followed'): ", ['list', 'followers', 'mutual', 'not followed'])
 
                 # Process the user's choice
                 if choice == 'list':
@@ -180,8 +191,8 @@ class Main():
                     user_list = None
 
                 # Get the number of activities to like per followed user and whether to include message activities
-                total_activities_to_like = int(input("Enter the number of activities you would like to like per user: "))
-                include_message_activity = input("Do you want to like message activities? - Messages sent to the user are considered that users activity. (y/n): ").lower() == 'y'
+                total_activities_to_like = get_valid_input("Enter the number of activities you would like to like per user (Max 100): ", validation_func=is_positive_integer)
+                include_message_activity = get_valid_input("Do you want to like message activities? - Messages sent to the user are considered that users activity. (y/n): ", ['y', 'n']).lower() == 'y'
 
                 print()
                 # Call the function to like activities
@@ -193,10 +204,10 @@ class Main():
 
                 print(f"Press the 'F12' key to stop liking activities. (There may be a slight delay before the program stops)\n")
                 # Ask the user for the refresh interval
-                refresh_interval = int(input("Enter the refresh interval in minutes (Give it some time, Anilist rate limits how fast you can get pages of activities): "))
-                total_pages = int(input("Enter the number of pages to like activities from (Max 100): "))
+                refresh_interval = get_valid_input("Enter the refresh interval in minutes (Give it some time, Anilist rate limits how fast you can get pages of activities): ", list(map(str, range(1, 101))))
+                total_pages = get_valid_input("Enter the number of pages to like activities from (Max 100): ", list(map(str, range(1, 101))))
 
                 # Call the function to like activities
-                RequestAPI.Like_Following_Activities(refresh_interval, total_pages)
+                RequestAPI.Like_Following_Activities(int(refresh_interval), int(total_pages))
 if __name__ == '__main__':
     Main()
