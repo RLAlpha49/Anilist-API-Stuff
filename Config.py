@@ -54,4 +54,11 @@ def load_unfollowed_ids():
 
 # Function to save a set of unfollowed IDs to a file
 def save_unfollowed_ids(unfollowed_ids):
-    save_json(list(unfollowed_ids), 'unfollowed_ids.json')
+    # Load existing IDs
+    existing_ids = load_unfollowed_ids()
+
+    # Add new IDs
+    updated_ids = existing_ids.union(unfollowed_ids)
+
+    # Save updated IDs
+    save_json(list(updated_ids), 'unfollowed_ids.json')

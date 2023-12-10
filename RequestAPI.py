@@ -360,7 +360,13 @@ def Get_Liked_Activities(perPage, totalPages, include_message_activity):
     display_not_appeared = input("\nDisplay users not appeared? (y/n): ").lower() == 'y'
     if display_not_appeared:
         print(f"\nUsers Not Appeared ({len(not_appeared_users)}): {not_appeared_users}")
-        
+
+        # Load the excluded IDs
+        excluded_ids = Config.load_excluded_ids()
+
+        # Exclude the users from the unfollowed IDs list
+        not_appeared_users = [user_id for user_id in not_appeared_users if user_id not in excluded_ids]
+
         unfollow_not_appeared = input("\nUnfollow users not appeared? (y/n): ").lower() == 'y'
         if unfollow_not_appeared:
             unfollowed_ids = []
