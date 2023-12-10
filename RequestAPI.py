@@ -268,7 +268,12 @@ def Like_Following_Activities(refresh_interval, total_pages):
         
         # Get the following activity feed
         query, variables = QM.Queries.Following_Activity_Feed_Query(page)
-        response = api_request(query, variables)
+        while True:
+            try:
+                response = api_request(query, variables)
+                break  # If the request is successful, break the loop
+            except requests.exceptions.ConnectionError:
+                print("A connection error occurred. Retrying...")
         following_activity_feed = response['data']['Page']['activities']
         print(f"\nChecking Page {page} for following activity feed")
 
