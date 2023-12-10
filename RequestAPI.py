@@ -316,3 +316,59 @@ def Like_Following_Activities(refresh_interval, total_pages):
     print(f"Failed requests: {failed_requests}")
 
     keyboard.unhook_all()
+
+def Get_Liked_Activities(perPage, totalPages, include_message_activity):
+    viewer_ID = Get_User_ID()
+    
+    user_likes_count = {}
+    following_users = Get_Following()  # Assuming this function returns a list of user IDs
+    not_appeared_users = {user_id: 0 for user_id in following_users}
+    activity_count = 0
+
+    for page in range(1, totalPages + 1):
+        print(f"\nChecking page {page}...")
+        query, variables = QM.Queries.User_Activity_Feed_Query(viewer_ID, page, perPage, include_message_activity)
+        response = api_request(query, variables)
+
+        activities = response['data']['Page']['activities']
+        if not activities:
+            print("No more activities to retrieve.")
+            break
+
+        for activity in activities:
+            activity_count += 1
+            if 'id' in activity:
+                print(f"Activity ID: {activity['id']}")
+            else:
+                print("Activity does not have an ID.")
+            if 'likes' in activity:
+                for user in activity['likes']:
+                    user_id = user['id']
+                    if user_id in user_likes_count:
+                        user_likes_count[user_id] += 1
+                    else:
+                        user_likes_count[user_id] = 1
+                    if user_id in not_appeared_users:
+                        del not_appeared_users[user_id]
+
+    print(f"\nTotal Activities processed: {activity_count}")
+    
+    print(f"\nUser Likes Count ({len(user_likes_count)}):")
+    for user_id, count in user_likes_count.items():
+        print(f"User ID: {user_id}, Count: {count}")
+
+    display_not_appeared = input("\nDisplay users not appeared? (y/n): ").lower() == 'y'
+    if display_not_appeared:
+        print(f"\nUsers Not Appeared ({len(not_appeared_users)}): {not_appeared_users}")
+        
+        unfollow_not_appeared = input("\nUnfollow users not appeared? (y/n): ").lower() == 'y'
+        if unfollow_not_appeared:
+            unfollowed_ids = []
+            for user_id in not_appeared_users:
+                # Call the function to unfollow the user
+                Unfollow_User(user_id)
+                unfollowed_ids.append(user_id)
+
+            save_unfollowed = input("\nSave unfollowed user IDs? (y/n): ").lower() == 'y'
+            if save_unfollowed:
+                Config.save_unfollowed_ids(set(unfollowed_ids))

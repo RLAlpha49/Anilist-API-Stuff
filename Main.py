@@ -46,7 +46,7 @@ class Main():
 
         print('Notice: Anilist will rate limit often, so please be patient when using this program. (Most times it rate limites a specific feature so you should be able to use other features on the site while this is running.)')
         while True:
-            option = get_valid_input("\n0. Exit\n1. Get Users Not Following Back\n2. Get Users You Are Not Following Back\n3. Follow Random Users From Global Activity Feed\n4. Like Users Activity\n5. Like Following Feed\nOption: ", ['0', '1', '2', '3', '4', '5'])
+            option = get_valid_input("\n0. Exit\n1. Get Users Not Following Back\n2. Get Users You Are Not Following Back\n3. Follow Random Users From Global Activity Feed\n4. Like Users Activity\n5. Like Following Feed\n6. Get Activity Count\nOption: ", ['0', '1', '2', '3', '4', '5', '6'])
             if option == '0':
                 break
             elif option == '1':
@@ -209,5 +209,12 @@ class Main():
 
                 # Call the function to like activities
                 RequestAPI.Like_Following_Activities(int(refresh_interval), int(total_pages))
+            elif option == '6':
+                perPage = get_valid_input("\nEnter the number of activities per page (Max 50): ", list(map(str, range(1, 51))))
+                totalPages = int(input("Enter the total number of pages to go through (There is no Max, program will stop when activities stop returning): "))
+                print(f"Total activities to check: {int(perPage) * totalPages}\n")
+                include_message_activity = get_valid_input("Do you want include message activities? (y/n): ", ['y', 'n']).lower() == 'y'
+                print()
+                RequestAPI.Get_Liked_Activities(int(perPage), totalPages, include_message_activity)
 if __name__ == '__main__':
     Main()

@@ -143,7 +143,7 @@ class Queries:
         return Query, Variables
 
     @staticmethod
-    def User_Activity_Feed_Query(userId, page, include_message_activity):
+    def User_Activity_Feed_Query(userId, page, perPage, include_message_activity):
         Query = """
         query ($userId: Int, $page: Int, $perPage: Int) {
             Page(page: $page, perPage: $perPage) {
@@ -151,10 +151,16 @@ class Queries:
                     ... on TextActivity {
                         id
                         isLiked
+                        likes {
+                            id
+                        }
                     }
                     ... on ListActivity {
                         id
                         isLiked
+                        likes {
+                            id
+                        }
                     }
         """
         if include_message_activity:
@@ -162,6 +168,9 @@ class Queries:
                     ... on MessageActivity {
                         id
                         isLiked
+                        likes {
+                            id
+                        }
                     }
             """
         Query += """
@@ -172,7 +181,7 @@ class Queries:
         Variables = {
             "userId": userId,
             "page": page,
-            "perPage": 50
+            "perPage": perPage
         }
         return Query, Variables
 
