@@ -51,6 +51,14 @@ This feature allows you to like activities from your following feed.
 - Option to stop liking activities by pressing the 'F12' key.
 - Option to set how often the feed should refresh in minutes.
 
+### Retrieve Users Who Like Your Activity
+
+This feature identifies users who have liked your activities.
+
+- Gives total of activities liked from users who have liked your activity
+- Provides an option to follow these users, given they are not in your list of previously unfollowed users.
+- If any new users are followed during this process, their IDs are displayed at the end.
+
 ## Installation
 
 - The `AnilistFollwerAndLikingTool.exe` file requires no prerequisites. Just run it.
