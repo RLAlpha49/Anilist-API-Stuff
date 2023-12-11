@@ -373,7 +373,7 @@ def Get_Liked_Activities(perPage, totalPages, include_message_activity):
     print(f"\nTotal Activities processed: {activity_count}")
 
     print(f"\nUser Likes Count ({len(user_likes_count)}):")
-    for user_id, count in user_likes_count.items():
+    for user_id, count in sorted(user_likes_count.items(), key=lambda item: item[1], reverse=True):
         print(f"User ID: {user_id}, Count: {count}")
 
     display_not_appeared = input("\nDisplay users not appeared? (y/n): ").lower() == 'y'
