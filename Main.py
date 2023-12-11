@@ -209,7 +209,7 @@ class Main():
 
                 print(f"Press the 'F12' key to stop liking activities. (There may be a slight delay before the program stops)\n")
                 # Ask the user for the refresh interval
-                refresh_interval = get_valid_input("Enter the refresh interval in minutes (Give it some time, Anilist rate limits how fast you can get pages of activities): ", list(map(str, range(1, 101))))
+                refresh_interval = get_valid_input("Enter the refresh interval in minutes (Give it some time, the Anilist API takes some time to sort from newest to oldest activities): ", list(map(str, range(1, 101))))
                 total_pages = get_valid_input("Enter the number of pages to like activities from (Max 100): ", list(map(str, range(1, 101))))
 
                 # Call the function to like activities

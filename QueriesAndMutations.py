@@ -90,13 +90,6 @@ class Queries:
         Query = """
         query ($page: Int, $perPage: Int, $isFollowing: Boolean) {
             Page (page: $page, perPage: $perPage) {
-                pageInfo {
-                    total
-                    currentPage
-                    lastPage
-                    hasNextPage
-                    perPage
-                }
                 activities(sort: ID_DESC, isFollowing: $isFollowing) {
                     ... on TextActivity {
                         id
@@ -111,11 +104,6 @@ class Queries:
                         user {
                             id
                         }
-                    }
-                    ... on MessageActivity {
-                        id
-                        isLiked
-                        messengerId
                     }
                 }
             }

@@ -278,12 +278,16 @@ def Like_Following_Activities(refresh_interval, total_pages):
         print(f"\nChecking Page {page} for following activity feed")
 
         for activity in following_activity_feed:
-            if activity['isLiked']:
-                #print(f"Activity is already liked, skipping...")
-                already_liked += 1
+            try:
+                if activity['isLiked']:
+                    #print(f"Activity is already liked, skipping...")
+                    already_liked += 1
+                    continue  # Skip this iteration and move to the next activity
+            except:
+                # Empty activity or no 'isLiked' key
                 continue  # Skip this iteration and move to the next activity
 
-            user_id = activity['user']['id'] if 'user' in activity else activity['messengerId']
+            user_id = activity['user']['id'] if 'user' in activity else None
             if user_id != viewer_ID:
                 activity_liked = Like_Activity(activity['id'])
                 if activity_liked:
@@ -293,7 +297,7 @@ def Like_Following_Activities(refresh_interval, total_pages):
                     print(f"Error: Activity with ID: {activity['id']}, User ID: {user_id}\n")
                     failed_requests += 1
             else:
-                print(f"\nActivity is from the viewer, skipping...\n")
+                print(f"\nActivity is from the viewer, skipping...")
 
             # Check if 'F12' has been pressed
             if stop:
