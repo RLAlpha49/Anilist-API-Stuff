@@ -319,11 +319,17 @@ def Like_Following_Activities(refresh_interval, total_pages):
 
 def Get_Liked_Activities(perPage, totalPages, include_message_activity):
     viewer_ID = Get_User_ID()
-    
+
     user_likes_count = {}
     following_users = Get_Following()  # Assuming this function returns a list of user IDs
     not_appeared_users = {user_id: 0 for user_id in following_users}
     activity_count = 0
+    
+    follow_unfollowed_users = input("\nWould you like to follow users who like your activity but you are not following them? (y/n): ").lower() == 'y'
+    followed_users = []
+    
+    # Load the unfollowed IDs
+    unfollowed_ids = Config.load_unfollowed_ids()
 
     for page in range(1, totalPages + 1):
         print(f"\nChecking page {page}...")
@@ -334,7 +340,7 @@ def Get_Liked_Activities(perPage, totalPages, include_message_activity):
         if not activities:
             print("No more activities to retrieve.")
             break
-
+        
         for activity in activities:
             activity_count += 1
             if 'id' in activity:
@@ -351,22 +357,31 @@ def Get_Liked_Activities(perPage, totalPages, include_message_activity):
                     if user_id in not_appeared_users:
                         del not_appeared_users[user_id]
 
+                    # If the user is not in the following list, not in the unfollowed list, and the user has chosen to follow unfollowed users, follow them
+                    if user_id not in following_users and user_id not in unfollowed_ids and follow_unfollowed_users:
+                        Follow_User(user_id)
+                        followed_users.append(user_id)  # Add the user ID to the followed_users list
+                        following_users.append(user_id)  # Add the user ID to the following_users list
+                        
+    if followed_users:
+        print(f"\nFollowed Users: {followed_users}")
+
     print(f"\nTotal Activities processed: {activity_count}")
-    
+
     print(f"\nUser Likes Count ({len(user_likes_count)}):")
     for user_id, count in user_likes_count.items():
         print(f"User ID: {user_id}, Count: {count}")
 
     display_not_appeared = input("\nDisplay users not appeared? (y/n): ").lower() == 'y'
     if display_not_appeared:
-        print(f"\nUsers Not Appeared ({len(not_appeared_users)}): {not_appeared_users}")
-
         # Load the excluded IDs
         excluded_ids = Config.load_excluded_ids()
 
         # Exclude the users from the unfollowed IDs list
         not_appeared_users = [user_id for user_id in not_appeared_users if user_id not in excluded_ids]
-
+        
+        print(f"\nUsers Not Appeared ({len(not_appeared_users)}): {not_appeared_users}")
+        
         unfollow_not_appeared = input("\nUnfollow users not appeared? (y/n): ").lower() == 'y'
         if unfollow_not_appeared:
             unfollowed_ids = []
