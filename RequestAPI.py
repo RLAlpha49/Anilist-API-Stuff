@@ -183,7 +183,7 @@ def Like_Activities(total_activities_to_like, include_message_activity, user_lis
         page = 1
         activities_liked = 0
         while activities_liked < total_activities_to_like:
-            query, variables = QM.Queries.User_Activity_Feed_Query(user_id, page, include_message_activity)
+            query, variables = QM.Queries.User_Activity_Feed_Query(user_id, page, 50, include_message_activity)
             response = api_request(query, variables)
 
             if response is None:
@@ -191,7 +191,7 @@ def Like_Activities(total_activities_to_like, include_message_activity, user_lis
                 break
 
             # Like the activity if it was not liked before and the activity's user ID is not the viewer's ID
-            activities = [activity for activity in response['data']['Page']['activities'] if activity and 'isLiked' in activity and not activity['isLiked'] and activity['user']['id'] != viewer_ID]
+            activities = [activity for activity in response['data']['Page']['activities'] if activity and 'isLiked' in activity and not activity['isLiked'] and 'user' in activity and activity['user']['id'] != viewer_ID]
 
             for activity in activities:
                 if activities_liked < total_activities_to_like:

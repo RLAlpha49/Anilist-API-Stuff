@@ -142,11 +142,17 @@ class Queries:
                         likes {
                             id
                         }
+                        user {
+                            id
+                        }
                     }
                     ... on ListActivity {
                         id
                         isLiked
                         likes {
+                            id
+                        }
+                        user {
                             id
                         }
                     }
@@ -159,6 +165,7 @@ class Queries:
                         likes {
                             id
                         }
+                        messengerId
                     }
             """
         Query += """
