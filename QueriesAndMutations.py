@@ -165,7 +165,7 @@ class Queries:
                         likes {
                             id
                         }
-                        messengerId
+                        recipientId
                     }
             """
         Query += """
