@@ -116,11 +116,14 @@ def Toggle_Follow_User(id, desired_status, success_message, error_message):
     if response is not None:
         if response['data']['ToggleFollow']['isFollowing'] == desired_status:
             print(success_message.format(response['data']['ToggleFollow']['name'], id))
+            return True
         else:
             print(error_message.format(response['data']['ToggleFollow']['name'], id))
             api_request(query, variables)
+            return False
     else:
         print(f"Failed to update follow status for user with ID: {id}")
+        return False
 
 def Unfollow_User(id):
     return Toggle_Follow_User(id, False, "Unfollowed {} with ID: {}", "Error: {} already unfollowed with ID: {}")
@@ -362,10 +365,10 @@ def Get_Liked_Activities(perPage, totalPages, include_message_activity):
                         del not_appeared_users[user_id]
 
                     # If the user is not in the following list, not in the unfollowed list, and the user has chosen to follow unfollowed users, follow them
-                    if user_id not in following_users and user_id not in unfollowed_ids and follow_unfollowed_users:
-                        Follow_User(user_id)
-                        followed_users.append(user_id)  # Add the user ID to the followed_users list
-                        following_users.append(user_id)  # Add the user ID to the following_users list
+                    if user_id not in following_users and user_id not in unfollowed_ids and follow_unfollowed_users and user_id != viewer_ID:
+                        if Follow_User(user_id):
+                            followed_users.append(user_id)  # Add the user ID to the followed_users list
+                            following_users.append(user_id)  # Add the user ID to the following_users list
                         
     if followed_users:
         print(f"\nFollowed Users: {followed_users}")
