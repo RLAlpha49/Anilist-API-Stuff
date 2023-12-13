@@ -191,7 +191,7 @@ def Like_Activities(total_activities_to_like, include_message_activity, user_lis
                 break
 
             # Like the activity if it was not liked before and the activity's user ID is not the viewer's ID
-            activities = [activity for activity in response['data']['Page']['activities'] if activity and 'isLiked' in activity and not activity['isLiked'] and 'user' in activity and activity['user']['id'] != viewer_ID and ('recipientId' not in activity or activity['recipientId'] == user_id)]
+            activities = [activity for activity in response['data']['Page']['activities'] if activity and 'isLiked' in activity and not activity['isLiked'] and ('user' not in activity or activity['user']['id'] != viewer_ID) and ('recipientId' not in activity or activity['recipientId'] == user_id)]
 
             for activity in activities:
                 if activities_liked < total_activities_to_like:
