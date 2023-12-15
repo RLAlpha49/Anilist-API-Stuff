@@ -59,19 +59,17 @@ def Get_User_ID():
 def Get_User_ID_From_Username(username):
     query, variables = QM.Queries.Get_User_ID_Query(username)
     response = API_Request(query, variables)
-    try:
+    if 'User' in response['data'] and 'id' in response['data']['User']:
         return response['data']['User']['id']
-    except TypeError:
-        print(f"Error: User {username} not found")
-        return None
+    print(f"Error: User {username} not found")
+    return None
 
 # Follow data related functions: These functions are related to getting follow data.
 
 def get_follow_data(query_func, message, key, page=1):
-    hasNextPage = True
     ids = []
 
-    while hasNextPage:
+    while True:
         query, variables = query_func(user_id, page)
         response = API_Request(query, variables)
 
@@ -79,7 +77,8 @@ def get_follow_data(query_func, message, key, page=1):
             ids.append(user['id'])
 
         print(f"{message}, Page {page} ID's: {ids[-len(response['data']['Page'][key]):]}")
-        hasNextPage = response['data']['Page']['pageInfo']['hasNextPage']
+        if not response['data']['Page']['pageInfo']['hasNextPage']:
+            break
         page += 1
     return ids
 
@@ -112,14 +111,14 @@ def Get_Not_Followed_Followers():
 # Input functions: These functions are related to getting user input.
 
 def Get_Valid_Input(prompt, valid_inputs=None, validation_func=None):
-            while True:
-                user_input = input(prompt)
-                if valid_inputs and user_input in valid_inputs:
-                    return user_input
-                elif validation_func and validation_func(user_input):
-                    return int(user_input)
-                else:
-                    print("Invalid input. Please try again.")
+    while True:
+        user_input = input(prompt)
+        if valid_inputs and user_input in valid_inputs:
+            return user_input
+        elif validation_func and validation_func(user_input):
+            return int(user_input)
+        else:
+            print("Invalid input. Please try again.")
 
 def Is_Positive_Integer(s):
     return s.isdigit() and int(s) > 0

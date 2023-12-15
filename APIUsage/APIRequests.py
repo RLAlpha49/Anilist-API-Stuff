@@ -10,9 +10,7 @@ def Handle_Rate_Limit(response):
     rate_limit_reset = int(response.headers.get('X-RateLimit-Reset', 0))
     
     if response.status_code == 429:
-        wait_time = rate_limit_reset - int(time.time())
-        if wait_time < 0:
-            wait_time = 60
+        wait_time = max(rate_limit_reset - int(time.time()), 60)
         print(f"\nRate limit hit. Waiting for {wait_time} seconds.\n")
         time.sleep(wait_time)
     elif rate_limit_remaining < 5:
@@ -21,7 +19,6 @@ def Handle_Rate_Limit(response):
 def API_Request(query, variables=None):
     response = requests.post(url, json={'query': query, 'variables': variables}, headers=headers)
     Handle_Rate_Limit(response)
-    #print(response.json())
     if response.status_code == 200:
         return response.json()
     elif response.status_code == 429:
