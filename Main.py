@@ -4,7 +4,6 @@ from Setup import Setup
 from AnilistUserActions import *
 
 # TODO: Add option to check activitiy counts within a certain time frame
-# TODO: Add option to add users to the list when checking activity counts when above a certain count
 
 class Main():
     def __init__(self):

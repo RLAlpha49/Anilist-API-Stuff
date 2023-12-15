@@ -20,10 +20,9 @@ def Toggle_Follow_User(id, desired_status, success_message, error_message):
             return True
         else:
             print(error_message.format(response['data']['ToggleFollow']['name'], id))
-            API_Request(query, variables)
-            return False
+            Toggle_Follow_User(id, desired_status, success_message, error_message)
     else:
-        print(f"Failed to update follow status for user with ID: {id}")
+        print(f"Failed to update follow status for user with ID: {id}\nUser account most likely deleted.")
         return False
 
 def Unfollow_User(id):
