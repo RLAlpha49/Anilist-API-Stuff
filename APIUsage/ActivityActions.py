@@ -1,135 +1,12 @@
 # Import necessary modules
-from API import Get_Access_Token
 import QueriesAndMutations as QM
+from .APIRequests import API_Request
+from .Utils import Get_Following, Get_User_ID
+from .UserActions import Follow_User, Unfollow_User, Like_Activity
 import Config
 import requests
 import time
-import operator
 import keyboard
-
-
-# Define the API endpoint
-url = 'https://graphql.anilist.co'
-
-def handle_rate_limit(response):
-    rate_limit_remaining = int(response.headers.get('X-RateLimit-Remaining', 0))
-    rate_limit_reset = int(response.headers.get('X-RateLimit-Reset', 0))
-    
-    if response.status_code == 429:
-        wait_time = rate_limit_reset - int(time.time())
-        if wait_time < 0:
-            wait_time = 60
-        print(f"\nRate limit hit. Waiting for {wait_time} seconds.\n")
-        time.sleep(wait_time)
-    elif rate_limit_remaining < 5:
-        print(f"Warning: Only {rate_limit_remaining} requests remaining until rate limit reset.")
-
-def api_request(query, variables=None):
-    response = requests.post(url, json={'query': query, 'variables': variables}, headers=headers)
-    handle_rate_limit(response)
-    #print(response.json())
-    if response.status_code == 200:
-        return response.json()
-    elif response.status_code == 429:
-        return api_request(query, variables)
-    else:
-        print(f"\nFailed to retrieve data. Status code: {response.status_code}\n")
-        return None
-    
-def get_follow_data(query_func, message, key, page=1):
-    hasNextPage = True
-    ids = []
-
-    while hasNextPage:
-        query, variables = query_func(user_id, page)
-        response = api_request(query, variables)
-
-        for user in response['data']['Page'][key]:
-            ids.append(user['id'])
-
-        print(f"{message}, Page {page} ID's: {ids[-len(response['data']['Page'][key]):]}")
-        hasNextPage = response['data']['Page']['pageInfo']['hasNextPage']
-        page += 1
-
-    return ids
-
-def Set_Access_Token():
-    global headers
-    config = Config.load_config('config.json')
-    try:
-        if config['ACCESS_TOKEN'] is not None:
-            # Get the access token
-            access_token = config['ACCESS_TOKEN']
-            
-            # Define the headers for the API request
-            headers = {
-                'Authorization': f'Bearer {access_token}'
-            }
-        else:
-            print("No access token found.")
-            config['ACCESS_TOKEN'] = Get_Access_Token()
-            Config.save_config(config, 'config.json')
-            Config.Set_Environment_Variables(config)
-    except TypeError:
-        print("No config file found")
-        return
-    
-def Check_Access_Token():
-    try:
-        query = QM.Queries.Check_Authentication()
-        response = requests.post(url, json={'query': query}, headers=headers)
-        status_code_errors = {401: "Error: Invalid Access Token", 400: "Error: Invalid Access Token"}
-        if response.status_code in status_code_errors:
-            print(status_code_errors[response.status_code])
-            return True
-        print("\nToken is valid.\n")
-        return False
-    except NameError:
-        Set_Access_Token()
-        return Check_Access_Token()
-
-def Get_User_ID():
-    global user_id
-    query = QM.Queries.Check_Authentication()
-    response = api_request(query)
-    user_id = response['data']['Viewer']['id']
-    return response['data']['Viewer']['id']
-
-def Get_User_ID_From_Username(username):
-    query, variables = QM.Queries.Get_User_ID_Query(username)
-    response = api_request(query, variables)
-    try:
-        return response['data']['User']['id']
-    except TypeError:
-        print(f"Error: User {username} not found")
-        return None
-
-def Get_Followers():
-    return get_follow_data(QM.Queries.Follower_Query, "Checking Followers", 'followers')
-
-def Get_Following():
-    return get_follow_data(QM.Queries.Following_Query, "Checking Following", 'following')
-
-def Toggle_Follow_User(id, desired_status, success_message, error_message):
-    query, variables = QM.Mutations.Follow_Mutation(id)
-    response = api_request(query, variables)
-    if response is not None:
-        if response['data']['ToggleFollow']['isFollowing'] == desired_status:
-            print(success_message.format(response['data']['ToggleFollow']['name'], id))
-            return True
-        else:
-            print(error_message.format(response['data']['ToggleFollow']['name'], id))
-            api_request(query, variables)
-            return False
-    else:
-        print(f"Failed to update follow status for user with ID: {id}")
-        return False
-
-def Unfollow_User(id):
-    return Toggle_Follow_User(id, False, "Unfollowed {} with ID: {}", "Error: {} already unfollowed with ID: {}")
-
-def Follow_User(id):
-    return Toggle_Follow_User(id, True, "Followed {} with ID: {}", "Error: {} already followed with ID: {}")
 
 def Get_Global_Activities(total_people_to_follow):
     page = 1
@@ -140,7 +17,7 @@ def Get_Global_Activities(total_people_to_follow):
 
     while people_followed < total_people_to_follow:
         query, variables = QM.Queries.Global_Activity_Feed_Query(page)
-        response = api_request(query, variables)
+        response = API_Request(query, variables)
 
         # Add the ids to the list and follow the user if they are not following the main user
         activity_ids = (activity['id'] for activity in response['data']['Page']['activities'] if 'user' in activity)
@@ -155,15 +32,6 @@ def Get_Global_Activities(total_people_to_follow):
         page += 1
 
     return list(activity_ids)
-
-def Like_Activity(id):
-    query, variables = QM.Mutations.Like_Mutation(id)
-    response = api_request(query, variables)
-    if response is not None and 'errors' not in response:
-        return True
-    else:
-        print(f"Failed to like activity with ID: {id}")
-        return False
 
 def Like_Activities(total_activities_to_like, include_message_activity, user_list=None):
     if user_list is None:
@@ -187,7 +55,7 @@ def Like_Activities(total_activities_to_like, include_message_activity, user_lis
         activities_liked = 0
         while activities_liked < total_activities_to_like:
             query, variables = QM.Queries.User_Activity_Feed_Query(user_id, page, 50, include_message_activity)
-            response = api_request(query, variables)
+            response = API_Request(query, variables)
 
             if response is None:
                 failed_requests += 1
@@ -226,24 +94,6 @@ def Like_Activities(total_activities_to_like, include_message_activity, user_lis
     print(f"Failed requests: {failed_requests}")
     print(f"User IDs with no more activities: {no_activities_user_ids}")
 
-def Compare_Followers(followers, following, operation):
-    result = operation(set(following), set(followers))
-    return list(result)
-
-def Get_Mutual_Followers():
-    followers = Get_Followers()
-    print()
-    following = Get_Following()
-    print()
-    return Compare_Followers(followers, following, operator.and_)
-
-def Get_Not_Followed_Followers():
-    followers = Get_Followers()
-    print()
-    following = Get_Following()
-    print()
-    return Compare_Followers(followers, following, operator.sub)
-
 def Like_Following_Activities(refresh_interval, total_pages):
     page = 1
     last_checked_page = 1
@@ -277,7 +127,7 @@ def Like_Following_Activities(refresh_interval, total_pages):
         query, variables = QM.Queries.Following_Activity_Feed_Query(page)
         while True:
             try:
-                response = api_request(query, variables)
+                response = API_Request(query, variables)
                 break
             except requests.exceptions.ConnectionError:
                 print("A connection error occurred. Retrying...")
@@ -327,7 +177,7 @@ def Like_Following_Activities(refresh_interval, total_pages):
             pages_without_likes = 0
 
     print(f"\nTotal likes: {total_likes}")
-    print(f"Activities skipped liking: {already_liked}")
+    print(f"Activities skipped: {already_liked}")
     print(f"Failed requests: {failed_requests}")
 
     keyboard.unhook_all()
@@ -349,7 +199,7 @@ def Get_Liked_Activities(perPage, totalPages, include_message_activity):
     for page in range(1, totalPages + 1):
         print(f"\nChecking page {page}...")
         query, variables = QM.Queries.User_Activity_Feed_Query(viewer_ID, page, perPage, include_message_activity)
-        response = api_request(query, variables)
+        response = API_Request(query, variables)
 
         activities = response['data']['Page']['activities']
         if not activities:
