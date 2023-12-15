@@ -3,7 +3,6 @@ import Config
 from API import Get_Access_Token
 import RequestAPI
 
-# TODO: When liking following activity feed, go back to previous page before time reset if no activities are liked for 2 or more pages
 # TODO: Add option to check activitiy counts within a certain time frame
 # TODO: Add option to add users to the list when checking activity counts when above a certain count
 
