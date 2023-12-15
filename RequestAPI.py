@@ -246,11 +246,14 @@ def Get_Not_Followed_Followers():
 
 def Like_Following_Activities(refresh_interval, total_pages):
     page = 1
+    last_checked_page = 1
+    pages_without_likes = 0
     start_time = time.time()
     stop = False
     total_likes = 0
     failed_requests = 0
     already_liked = 0
+    timer_reset = False
     
     viewer_ID = Get_User_ID()
 
@@ -263,32 +266,32 @@ def Like_Following_Activities(refresh_interval, total_pages):
     while not stop:  # Run until 'F12' is pressed
         if page == total_pages + 1:
             print("\nPage limit reached. Resetting to page 1.")
-            # Sleep for 5 seconds before resetting the page
-            # Mostly for if total_pages is a low number and to stop the script from running too fast
             time.sleep(5)
             page = 1
-            start_time = time.time()  # Reset the start time
-        
-        # Get the following activity feed
+        elif total_pages >= 5 and pages_without_likes >= 2 and timer_reset:
+                page = last_checked_page if last_checked_page > 1 else 1
+                pages_without_likes = 0
+                timer_reset = False
+                print(f"\nNo activities liked after 2 pages. Skipping to page {last_checked_page}")
+
         query, variables = QM.Queries.Following_Activity_Feed_Query(page)
         while True:
             try:
                 response = api_request(query, variables)
-                break  # If the request is successful, break the loop
+                break
             except requests.exceptions.ConnectionError:
                 print("A connection error occurred. Retrying...")
         following_activity_feed = response['data']['Page']['activities']
         print(f"\nChecking Page {page} for following activity feed")
 
+        page_likes = 0
         for activity in following_activity_feed:
             try:
                 if activity['isLiked']:
-                    #print(f"Activity is already liked, skipping...")
                     already_liked += 1
-                    continue  # Skip this iteration and move to the next activity
+                    continue
             except:
-                # Empty activity or no 'isLiked' key
-                continue  # Skip this iteration and move to the next activity
+                continue
 
             user_id = activity['user']['id'] if 'user' in activity else None
             if user_id != viewer_ID:
@@ -296,27 +299,32 @@ def Like_Following_Activities(refresh_interval, total_pages):
                 if activity_liked:
                     print(f"Liked activity with ID: {activity['id']}, User ID: {user_id}")
                     total_likes += 1
+                    page_likes += 1
                 else:
                     print(f"Error: Activity with ID: {activity['id']}, User ID: {user_id}\n")
                     failed_requests += 1
-            else:
-                print(f"\nActivity is from the viewer, skipping...")
 
-            # Check if 'F12' has been pressed
             if stop:
-                break  # Break out of the for loop
+                break
 
-        # Check if 'F12' has been pressed
         if stop:
-            break  # Break out of the while loop
+            break
 
+        if page_likes > 0:
+            pages_without_likes = 0
+        else:
+            pages_without_likes += 1
+
+        if timer_reset is False:
+            last_checked_page = page
         page += 1
 
-        # Refresh the following activity feed every refresh_interval minutes
-        if time.time() - start_time >= refresh_interval * 60:
+        if time.time() - start_time >= refresh_interval * 60 and not timer_reset:
             print(f"\nRefreshing following activity feed after {refresh_interval} minutes")
-            start_time = time.time()  # Reset the start time
-            page = 1  # Go to the beginning activity feed
+            page = 1
+            start_time = time.time()
+            timer_reset = True
+            pages_without_likes = 0
 
     print(f"\nTotal likes: {total_likes}")
     print(f"Activities skipped liking: {already_liked}")
