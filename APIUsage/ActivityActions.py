@@ -253,7 +253,9 @@ def Get_Liked_Activities(perPage, totalPages, include_message_activity):
         else:
             # If the count is not greater than the likes_threshold, remove the user from the user_likes_count list and add them to the not_appeared_users list
             del user_likes_count[user_id]
-            not_appeared_users[user_id] = 0
+            # Only add the user to the not_appeared_users list if they are in the following_users list
+            if user_id in following_users:
+                not_appeared_users[user_id] = 0
 
     display_not_appeared = input("\nDisplay users not appeared? (y/n): ").lower() == 'y'
     if display_not_appeared:
