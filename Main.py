@@ -3,7 +3,6 @@ from APIUsage.Utils import Get_Valid_Input
 from Setup import Setup
 from AnilistUserActions import *
 
-# TODO: Add option to check activitiy counts within a certain time frame
 # TODO: Add option to like activities within a certain time frame
 
 class Main():
