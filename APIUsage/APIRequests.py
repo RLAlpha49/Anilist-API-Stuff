@@ -8,7 +8,6 @@ url = 'https://graphql.anilist.co'
 def Handle_Rate_Limit(response):
     rate_limit_remaining = int(response.headers.get('X-RateLimit-Remaining', 0))
     rate_limit_reset = int(response.headers.get('X-RateLimit-Reset', 0))
-    
     if response.status_code == 429:
         wait_time = max(rate_limit_reset - int(time.time()), 60)
         print(f"\nRate limit hit. Waiting for {wait_time} seconds.\n")
@@ -18,6 +17,7 @@ def Handle_Rate_Limit(response):
 
 def API_Request(query, variables=None):
     response = requests.post(url, json={'query': query, 'variables': variables}, headers=headers)
+    #print(response.json())
     Handle_Rate_Limit(response)
     if response.status_code == 200:
         return response.json()

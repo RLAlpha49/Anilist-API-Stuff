@@ -1,7 +1,7 @@
 # Import necessary modules
 import QueriesAndMutations as QM
 from .APIRequests import API_Request
-from .Utils import Get_Following, Get_User_ID
+from .Utils import Get_Following, Get_User_ID, Get_Valid_Input, Is_Positive_Integer, Is_Valid_Time_Period, Convert_Time_To_Seconds
 from .UserActions import Follow_User, Unfollow_User, Like_Activity
 import Config
 import requests
@@ -190,18 +190,24 @@ def Get_Liked_Activities(perPage, totalPages, include_message_activity):
     not_appeared_users = {user_id: 0 for user_id in following_users}
     activity_count = 0
 
-    follow_unfollowed_users = input("\nWould you like to follow users who like your activity but you are not following them? (y/n): ").lower() == 'y'
+    follow_unfollowed_users = Get_Valid_Input("\nWould you like to follow users who like your activity but you are not following them? (y/n): ", valid_inputs=['y', 'n']).lower() == 'y'
     followed_users = []
 
     # Load the unfollowed IDs
     unfollowed_ids = Config.load_unfollowed_ids()
+    
+    # Ask the user for a time frame
+    time_back = Get_Valid_Input("\nHow far back should it check for activities? Enter a number for days, or append 'w' for weeks, 'm' for months, or 'y' for years (e.g., '2w' for 2 weeks): ", validation_func=Is_Valid_Time_Period)
+    time_back_seconds = Convert_Time_To_Seconds(time_back)
+    end_time = int(time.time())  # Current time in Unix timestamp
+    start_time = end_time - time_back_seconds # Subtract the number of seconds in the specified number of days
 
     # Set the threshold for the number of activities a user needs to have liked
-    likes_threshold = int(input("\nEnter the minimum number of activities a user needs to have liked to be included in the list: "))
+    likes_threshold = Get_Valid_Input("\nEnter the minimum number of activities a user needs to have liked to be included in the list: ", validation_func=Is_Positive_Integer)
 
     for page in range(1, totalPages + 1):
         print(f"\nChecking page {page}...")
-        query, variables = QM.Queries.User_Activity_Feed_Query(viewer_ID, page, perPage, include_message_activity)
+        query, variables = QM.Queries.User_Activity_Feed_Query(viewer_ID, page, perPage, include_message_activity, start_time, end_time)
         response = API_Request(query, variables)
 
         activities = response['data']['Page']['activities']

@@ -116,9 +116,32 @@ def Get_Valid_Input(prompt, valid_inputs=None, validation_func=None):
         if valid_inputs and user_input in valid_inputs:
             return user_input
         elif validation_func and validation_func(user_input):
-            return int(user_input)
+            return int(user_input) if validation_func == Is_Positive_Integer else user_input
         else:
             print("Invalid input. Please try again.")
 
 def Is_Positive_Integer(s):
     return s.isdigit() and int(s) > 0
+
+def Is_Valid_Time_Period(s):
+    if s.isdigit():
+        return True  # Days
+    elif s.endswith('w') and s[:-1].isdigit():
+        return True  # Weeks
+    elif s.endswith('m') and s[:-1].isdigit():
+        return True  # Months
+    elif s.endswith('y') and s[:-1].isdigit():
+        return True  # Years
+    return False
+
+def Convert_Time_To_Seconds(time_back):
+    # Convert the time period to seconds
+    if time_back.endswith('w'):
+        time_back_seconds = int(time_back[:-1]) * 7 * 24 * 60 * 60
+    elif time_back.endswith('m'):
+        time_back_seconds = int(time_back[:-1]) * 30 * 24 * 60 * 60
+    elif time_back.endswith('y'):
+        time_back_seconds = int(time_back[:-1]) * 365 * 24 * 60 * 60
+    else:
+        time_back_seconds = int(time_back) * 24 * 60 * 60
+    return time_back_seconds
