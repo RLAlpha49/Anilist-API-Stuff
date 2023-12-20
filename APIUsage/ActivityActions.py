@@ -128,7 +128,8 @@ def Like_Following_Activities(refresh_interval, total_pages):
         while True:
             try:
                 response = API_Request(query, variables)
-                break
+                if response is not None:
+                    break
             except requests.exceptions.ConnectionError:
                 print("A connection error occurred. Retrying...")
         following_activity_feed = response['data']['Page']['activities']

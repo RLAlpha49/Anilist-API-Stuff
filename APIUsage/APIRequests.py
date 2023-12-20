@@ -23,6 +23,9 @@ def API_Request(query, variables=None):
         return response.json()
     elif response.status_code == 429:
         return API_Request(query, variables)
+    elif response.status_code == 502:
+        print("\nServer/Gateway error. Retrying...\n")
+        return API_Request(query, variables)
     else:
         print(f"\nFailed to retrieve data. Status code: {response.status_code}\n")
         return None
