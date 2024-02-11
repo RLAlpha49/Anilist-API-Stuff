@@ -10,7 +10,7 @@ class Queries:
         }
         """
         return Query
-    
+
     @staticmethod
     def create_page_query(query_name):
         return f"""
@@ -32,20 +32,20 @@ class Queries:
 
     @staticmethod
     def create_variables(user_id, page):
-        return {
-            "userId": user_id,
-            "page": page,
-            "perPage": 50
-        }
+        return {"userId": user_id, "page": page, "perPage": 50}
 
     @staticmethod
     def Follower_Query(user_id, page):
-        return Queries.create_page_query('followers'), Queries.create_variables(user_id, page)
+        return Queries.create_page_query("followers"), Queries.create_variables(
+            user_id, page
+        )
 
     @staticmethod
     def Following_Query(user_id, page):
-        return Queries.create_page_query('following'), Queries.create_variables(user_id, page)
-    
+        return Queries.create_page_query("following"), Queries.create_variables(
+            user_id, page
+        )
+
     @staticmethod
     def Global_Activity_Feed_Query(page):
         Query = """
@@ -79,12 +79,9 @@ class Queries:
             }
         }
         """
-        Variables = {
-            "page": page,
-            "perPage": 50
-        }
+        Variables = {"page": page, "perPage": 50}
         return Query, Variables
-    
+
     @staticmethod
     def Following_Activity_Feed_Query(page):
         Query = """
@@ -109,13 +106,9 @@ class Queries:
             }
         }
         """
-        Variables = {
-            "page": page,
-            "perPage": 50,
-            "isFollowing": True
-        }
+        Variables = {"page": page, "perPage": 50, "isFollowing": True}
         return Query, Variables
-    
+
     @staticmethod
     def Get_User_ID_Query(username):
         Query = """
@@ -125,13 +118,13 @@ class Queries:
             }
         }
         """
-        Variables = {
-            "name": username
-        }
+        Variables = {"name": username}
         return Query, Variables
 
     @staticmethod
-    def User_Activity_Feed_Query(userId, page, perPage, include_message_activity, start_time=None, end_time=None):
+    def User_Activity_Feed_Query(
+        userId, page, perPage, include_message_activity, start_time=None, end_time=None
+    ):
         Query = """
         query ($userId: Int, $page: Int, $perPage: Int, $createdAtGreater: Int, $createdAtLesser: Int) {
             Page(page: $page, perPage: $perPage) {
@@ -178,9 +171,10 @@ class Queries:
             "page": page,
             "perPage": perPage,
             "createdAtGreater": start_time,
-            "createdAtLesser": end_time
+            "createdAtLesser": end_time,
         }
         return Query, Variables
+
 
 class Mutations:
     @staticmethod
@@ -194,11 +188,9 @@ class Mutations:
             }
         }
         """
-        Variables = {
-            "id": user_id
-        }
+        Variables = {"id": user_id}
         return Mutation, Variables
-    
+
     @staticmethod
     def Like_Mutation(activity_id):
         Mutation = """
@@ -208,8 +200,5 @@ class Mutations:
             }
         }
         """
-        Variables = {
-            "id": activity_id,
-            "type": "ACTIVITY"
-        }
+        Variables = {"id": activity_id, "type": "ACTIVITY"}
         return Mutation, Variables

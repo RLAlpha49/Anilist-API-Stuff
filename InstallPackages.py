@@ -1,6 +1,7 @@
 import subprocess
 import sys
 
+
 def install_packages(packages):
     for package in packages:
         try:
@@ -12,6 +13,7 @@ def install_packages(packages):
             print("Python or pip is not installed on this system.")
             input("Please install Python and pip and try again. Press enter to exit...")
             break
+
 
 # List of packages to install
 packages = ["requests"]
