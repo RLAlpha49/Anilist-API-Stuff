@@ -1,15 +1,31 @@
+"""
+This module contains the Setup function which is responsible for setting up the 
+environment for the application. It loads the configuration from a JSON file, 
+sets up the environment variables, and manages the access token for the Anilist API.
+"""
+
+# pylint: disable=C0103
+
 # Import necessary modules
 from APIUsage.Utils import Get_Access_Token, Set_Access_Token, Check_Access_Token
 import Config
 
 
 def Setup():
+    """
+    Loads the configuration from a JSON file and sets up the environment variables.
+    If the configuration file is not found, it prompts the user to enter the
+    Client ID and Secret ID. It then creates and saves a new configuration, sets
+    the environment variables, and sets the access token. If the access token is
+    not valid, it refreshes the access token.
+    """
     # Load configuration and ask for client and secret IDs if not found
     config = Config.load_config("config.json")
     if not config:
         input("Config file not found. Press enter to continue...")
         print(
-            "Please create an API on Anilist for the following values (Set Rediruct URL to: https://anilist.co/api/v2/oauth/pin):"
+            "Please create an API on Anilist for the following values "
+            "(Set Redirect URL to: https://anilist.co/api/v2/oauth/pin):"
         )
         client = input("Enter Client ID: ")
         secret = input("Enter Secret ID: ")
