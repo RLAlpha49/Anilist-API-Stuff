@@ -48,6 +48,8 @@ def Get_Global_Activities(total_people_to_follow):
     unfollowed_ids = Config.load_unfollowed_ids()
     print()
 
+    activity_ids = []
+
     while people_followed < total_people_to_follow:
         query, variables = QM.Queries.Global_Activity_Feed_Query(page)
         response = API_Request(query, variables)

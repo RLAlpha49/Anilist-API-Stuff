@@ -38,7 +38,7 @@ def Toggle_Follow_User(user_id, desired_status, success_message, error_message):
     Toggles the follow status of a user.
 
     Args:
-        id (str): The ID of the user to follow/unfollow.
+        user_id (str): The ID of the user to follow/unfollow.
         desired_status (bool): The desired follow status. True for follow, False for unfollow.
         success_message (str): The message to print if the operation is successful.
         error_message (str): The message to print if the operation fails.
