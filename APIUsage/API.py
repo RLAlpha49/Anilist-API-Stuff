@@ -9,9 +9,10 @@ Functions:
 # pylint: disable=C0103
 
 # Import necessary modules
-import webbrowser
 import os
 import platform
+
+import webbrowser
 
 # Define the authorization URL for AniList OAuth
 AUTHORIZATION_URL = "https://anilist.co/api/v2/oauth/authorize"

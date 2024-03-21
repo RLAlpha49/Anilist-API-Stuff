@@ -1,5 +1,5 @@
 """
-This module contains a function to follow a specified number of random users. 
+This module contains a function to follow a specified number of random users.
 It gets user inputs for the number of people they would like to follow,
 then calls a function to get the global activities of the specified number of people.
 """

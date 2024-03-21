@@ -1,7 +1,7 @@
 """
-This module contains utility functions for the Anilist API. 
+This module contains utility functions for the Anilist API.
 
-It includes functions for setting and checking access tokens, retrieving user IDs, 
+It includes functions for setting and checking access tokens, retrieving user IDs,
 getting follow data, comparing followers and following, and validating user input.
 """
 
@@ -9,12 +9,13 @@ getting follow data, comparing followers and following, and validating user inpu
 
 # Import necessary modules
 import operator
-import requests
+
 import Config
 import QueriesAndMutations as QM
+import requests
+
 from .API import Get_Access_Token  # pylint: disable=E0402
 from .APIRequests import API_Request, Set_Headers  # pylint: disable=E0402
-
 
 # Define the API endpoint
 URL = "https://graphql.anilist.co"

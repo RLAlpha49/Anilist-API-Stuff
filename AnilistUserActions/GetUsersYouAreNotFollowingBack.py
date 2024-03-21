@@ -1,10 +1,10 @@
 """
-This module contains functions to identify and follow users that the current 
+This module contains functions to identify and follow users that the current
 user is not following back.
 
-The main function `GetUsersYouAreNotFollowingBack` fetches the user's followers 
-and following lists, identifies users that are followers but not being followed 
-back, and offers to exclude them from the unfollowed IDs list. If there are such 
+The main function `GetUsersYouAreNotFollowingBack` fetches the user's followers
+and following lists, identifies users that are followers but not being followed
+back, and offers to exclude them from the unfollowed IDs list. If there are such
 users, the function offers to follow them.
 """
 
@@ -12,7 +12,7 @@ users, the function offers to follow them.
 
 # Import necessary modules
 from APIUsage.UserActions import Follow_User
-from APIUsage.Utils import Get_User_ID, Get_Followers, Get_Following, Get_Valid_Input
+from APIUsage.Utils import Get_Followers, Get_Following, Get_User_ID, Get_Valid_Input
 from Config import load_unfollowed_ids
 
 

@@ -1,9 +1,9 @@
 """
-This module contains a function to install Python packages using pip. 
+This module contains a function to install Python packages using pip.
 
-The function `install_packages` takes a list of package names as input and 
-attempts to install each one using pip. If the installation of a package fails, 
-it prints an error message. If Python or pip is not installed on the system, 
+The function `install_packages` takes a list of package names as input and
+attempts to install each one using pip. If the installation of a package fails,
+it prints an error message. If Python or pip is not installed on the system,
 it prints an error message and exits.
 """
 

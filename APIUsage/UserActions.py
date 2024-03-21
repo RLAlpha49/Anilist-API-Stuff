@@ -12,6 +12,7 @@ Functions:
 
 # Import necessary modules
 import QueriesAndMutations as QM
+
 from .APIRequests import API_Request  # pylint: disable=E0402
 
 

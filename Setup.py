@@ -1,14 +1,15 @@
 """
-This module contains the Setup function which is responsible for setting up the 
-environment for the application. It loads the configuration from a JSON file, 
+This module contains the Setup function which is responsible for setting up the
+environment for the application. It loads the configuration from a JSON file,
 sets up the environment variables, and manages the access token for the Anilist API.
 """
 
 # pylint: disable=C0103
 
 # Import necessary modules
-from APIUsage.Utils import Get_Access_Token, Set_Access_Token, Check_Access_Token
 import Config
+
+from APIUsage.Utils import Check_Access_Token, Get_Access_Token, Set_Access_Token
 
 
 def Setup():

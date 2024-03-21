@@ -1,14 +1,14 @@
 """
-This module contains two classes, Queries and Mutations, that construct and 
+This module contains two classes, Queries and Mutations, that construct and
 return various GraphQL queries and mutations.
 
-The Queries class contains static methods that construct and return various 
-GraphQL queries. Each method corresponds to a specific type of query, such as 
-checking authentication, creating a page query, creating variables for a query, 
+The Queries class contains static methods that construct and return various
+GraphQL queries. Each method corresponds to a specific type of query, such as
+checking authentication, creating a page query, creating variables for a query,
 and more.
 
-The Mutations class contains static methods that construct and return various 
-GraphQL mutations. Each method corresponds to a specific type of mutation, 
+The Mutations class contains static methods that construct and return various
+GraphQL mutations. Each method corresponds to a specific type of mutation,
 such as following a user or liking an activity.
 """
 
@@ -252,7 +252,12 @@ class Queries:
         Query = """
         query ($userId: Int, $page: Int, $perPage: Int, $createdAtGreater: Int, $createdAtLesser: Int) {
             Page(page: $page, perPage: $perPage) {
-                activities(userId: $userId, sort: ID_DESC, createdAt_greater: $createdAtGreater, createdAt_lesser: $createdAtLesser) {
+                activities(
+                    userId: $userId, 
+                    sort: ID_DESC, 
+                    createdAt_greater: $createdAtGreater, 
+                    createdAt_lesser: $createdAtLesser
+                ) {
                     ... on TextActivity {
                         id
                         isLiked

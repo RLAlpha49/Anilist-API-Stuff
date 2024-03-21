@@ -1,6 +1,6 @@
 """
-This module contains the main entry point for the program. It provides a 
-menu for the user to select various options related to the Anilist API and 
+This module contains the main entry point for the program. It provides a
+menu for the user to select various options related to the Anilist API and
 performs the corresponding actions based on the user's selection.
 
 Classes:
@@ -13,23 +13,26 @@ Functions:
 # pylint: disable=C0103
 
 # Import necessary modules
-from APIUsage.Utils import Get_Valid_Input
-from Setup import Setup
 from AnilistUserActions import (
+    FollowRandomUsers,
+    GetActivityCount,
     GetUsersNotFollowingBack,
     GetUsersYouAreNotFollowingBack,
-    FollowRandomUsers,
-    LikeUsersActivity,
     LikeFollowingFeed,
-    GetActivityCount,
+    LikeUsersActivity,
 )
+
+from APIUsage.Utils import Get_Valid_Input
+from Setup import Setup
+
 
 class Main:  # pylint: disable=R0903
     """
-    This class serves as the main entry point for the program. It provides a 
-    menu for the user to select various options and performs the corresponding 
+    This class serves as the main entry point for the program. It provides a
+    menu for the user to select various options and performs the corresponding
     actions based on the user's selection.
     """
+
     def __init__(self):
         Setup()
 

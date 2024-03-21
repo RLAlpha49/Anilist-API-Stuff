@@ -1,5 +1,5 @@
 """
-This module contains helper functions for loading and saving JSON data, 
+This module contains helper functions for loading and saving JSON data,
 managing configuration dictionaries, and handling sets of IDs.
 
 Functions:
@@ -18,8 +18,9 @@ Functions:
 # pylint: disable=C0103
 
 # Import necessary modules
-import os
 import json
+
+import os
 
 
 # Helper function to load JSON data from a file

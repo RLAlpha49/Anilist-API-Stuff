@@ -1,9 +1,9 @@
 """
-This module contains the function `LikeFollowingFeed` which is used to like 
+This module contains the function `LikeFollowingFeed` which is used to like
 activities from the following feed.
 
-The user specifies the refresh interval and the number of pages to like 
-activities from. The function will continue to like activities until the 
+The user specifies the refresh interval and the number of pages to like
+activities from. The function will continue to like activities until the
 'F12' key is pressed.
 """
 

@@ -7,24 +7,24 @@ This module contains the actions related to activities.
 # Import necessary modules
 import time
 
-import requests
-import keyboard
-
 import Config
+import keyboard
 import QueriesAndMutations as QM
+import requests
+
 from .APIRequests import API_Request  # pylint: disable=E0402
 from .UserActions import (  # pylint: disable=E0402
     Follow_User,
-    Unfollow_User,
     Like_Activity,
+    Unfollow_User,
 )
 from .Utils import (  # pylint: disable=E0402
+    Convert_Time_To_Seconds,
     Get_Following,
     Get_User_ID,
     Get_Valid_Input,
     Is_Positive_Integer,
     Is_Valid_Time_Period,
-    Convert_Time_To_Seconds,
 )
 
 
@@ -456,9 +456,11 @@ def Get_Liked_Activities(perPage, totalPages, include_message_activity):
         follow_unfollowed_users,
     )
 
-    context.user_likes_count, context.not_appeared_users, context.followed_users = (
-        process_activities(context)
-    )
+    (
+        context.user_likes_count,
+        context.not_appeared_users,
+        context.followed_users,
+    ) = process_activities(context)
 
     context.followed_users, context.following_users = follow_users(
         context.followed_users,
