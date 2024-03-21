@@ -10,9 +10,9 @@ getting follow data, comparing followers and following, and validating user inpu
 # Import necessary modules
 import operator
 
+import requests
 import Config
 import QueriesAndMutations as QM
-import requests
 
 from .API import Get_Access_Token  # pylint: disable=E0402
 from .APIRequests import API_Request, Set_Headers  # pylint: disable=E0402

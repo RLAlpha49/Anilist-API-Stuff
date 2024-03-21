@@ -7,10 +7,10 @@ This module contains the actions related to activities.
 # Import necessary modules
 import time
 
-import keyboard
-import requests
 import Config
+import keyboard  # pylint: disable=C0411
 import QueriesAndMutations as QM
+import requests  # pylint: disable=C0411
 
 from .APIRequests import API_Request  # pylint: disable=E0402
 from .UserActions import (  # pylint: disable=E0402
