@@ -3,3 +3,4 @@ config.json
 excluded_ids.json
 dist
 unfollowed_ids.json
+/.idea

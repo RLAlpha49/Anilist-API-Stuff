@@ -22,6 +22,9 @@ class Queries:
     creating a page query, creating variables for a query, and more.
     """
 
+    def __init__(self):
+        pass
+
     @staticmethod
     def Check_Authentication():
         """
@@ -303,6 +306,9 @@ class Mutations:
     GraphQL mutations. Each method corresponds to a specific type of mutation,
     such as following a user or liking an activity.
     """
+
+    def __init__(self):
+        pass
 
     @staticmethod
     def Follow_Mutation(user_id):
