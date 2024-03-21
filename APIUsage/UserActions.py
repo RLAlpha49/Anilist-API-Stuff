@@ -12,9 +12,8 @@ Functions:
 
 # Import necessary modules
 import QueriesAndMutations as QM
-from .APIRequests import APIHandler  # pylint: disable=E0402
+from .APIRequests import API_Request  # pylint: disable=E0402
 
-api_handler = APIHandler()
 
 def Like_Activity(activity_id):
     """
@@ -27,7 +26,7 @@ def Like_Activity(activity_id):
         bool: True if the like action was successful, False otherwise.
     """
     query, variables = QM.Mutations.Like_Mutation(activity_id)
-    response = api_handler.API_Request(query, variables)
+    response = API_Request(query, variables)
     if response is not None and "errors" not in response:
         return True
     print(f"Failed to like activity with ID: {activity_id}")
@@ -48,7 +47,7 @@ def Toggle_Follow_User(user_id, desired_status, success_message, error_message):
         bool: True if the operation was successful, False otherwise.
     """
     query, variables = QM.Mutations.Follow_Mutation(user_id)
-    response = api_handler.API_Request(query, variables)
+    response = API_Request(query, variables)
     if response is not None:
         if response["data"]["ToggleFollow"]["isFollowing"] == desired_status:
             print(

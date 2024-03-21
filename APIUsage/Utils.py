@@ -13,9 +13,8 @@ import requests
 import Config
 import QueriesAndMutations as QM
 from .API import Get_Access_Token  # pylint: disable=E0402
-from .APIRequests import APIHandler  # pylint: disable=E0402
+from .APIRequests import API_Request, Set_Headers  # pylint: disable=E0402
 
-api_handler = APIHandler()
 
 # Define the API endpoint
 URL = "https://graphql.anilist.co"
@@ -41,7 +40,7 @@ def Set_Access_Token():
 
             # Define the headers for the API request
             headers = {"Authorization": f"Bearer {access_token}"}
-            api_handler.Set_Headers(headers)
+            Set_Headers(headers)
         else:
             print("No access token found.")
             config["ACCESS_TOKEN"] = Get_Access_Token()
@@ -99,7 +98,7 @@ def Get_User_ID():
     """
     global user_id  # pylint: disable=w0601
     query = QM.Queries.Check_Authentication()
-    response = api_handler.API_Request(query)
+    response = API_Request(query)
     user_id = response["data"]["Viewer"]["id"]
     return response["data"]["Viewer"]["id"]
 
@@ -115,7 +114,7 @@ def Get_User_ID_From_Username(username):
         int: The user ID of the user if found, None otherwise.
     """
     query, variables = QM.Queries.Get_User_ID_Query(username)
-    response = api_handler.API_Request(query, variables)
+    response = API_Request(query, variables)
     if "User" in response["data"] and "id" in response["data"]["User"]:
         return response["data"]["User"]["id"]
     print(f"Error: User {username} not found")
@@ -145,7 +144,7 @@ def get_follow_data(query_func, message, key, page=1):
 
     while True:
         query, variables = query_func(user_id, page)
-        response = api_handler.API_Request(query, variables)
+        response = API_Request(query, variables)
 
         for user in response["data"]["Page"][key]:
             ids.append(user["id"])

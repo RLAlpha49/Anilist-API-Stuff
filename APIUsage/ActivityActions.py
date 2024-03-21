@@ -12,7 +12,7 @@ import keyboard
 
 import Config
 import QueriesAndMutations as QM
-from .APIRequests import APIHandler  # pylint: disable=E0402
+from .APIRequests import API_Request  # pylint: disable=E0402
 from .UserActions import (  # pylint: disable=E0402
     Follow_User,
     Unfollow_User,
@@ -26,8 +26,6 @@ from .Utils import (  # pylint: disable=E0402
     Is_Valid_Time_Period,
     Convert_Time_To_Seconds,
 )
-
-api_handler = APIHandler()
 
 
 def Get_Global_Activities(total_people_to_follow):
@@ -50,11 +48,9 @@ def Get_Global_Activities(total_people_to_follow):
     unfollowed_ids = Config.load_unfollowed_ids()
     print()
 
-    activity_ids = []  # Initialize activity_ids as an empty list
-
     while people_followed < total_people_to_follow:
         query, variables = QM.Queries.Global_Activity_Feed_Query(page)
-        response = api_handler.API_Request(query, variables)
+        response = API_Request(query, variables)
 
         # Add the ids to the list and follow the user if they are not following the main user
         activity_ids = (
@@ -125,7 +121,7 @@ def Like_Activities(total_activities_to_like, include_message_activity, user_lis
             query, variables = QM.Queries.User_Activity_Feed_Query(
                 user_id, page, 50, include_message_activity
             )
-            response = api_handler.API_Request(query, variables)
+            response = API_Request(query, variables)
 
             if response is None:
                 counters["failed_requests"] += 1
@@ -292,7 +288,7 @@ def handle_activities(state, viewer_ID):
     query, variables = QM.Queries.Following_Activity_Feed_Query(state["page"])
     while True:
         try:
-            response = api_handler.API_Request(query, variables)
+            response = API_Request(query, variables)
             if response is not None:
                 break
         except requests.exceptions.ConnectionError:
@@ -544,7 +540,7 @@ def process_activities(context):
             context.start_time,
             context.end_time,
         )
-        response = api_handler.API_Request(query, variables)
+        response = API_Request(query, variables)
         activities = response["data"]["Page"]["activities"]
         if not activities:
             print("No more activities to retrieve.")

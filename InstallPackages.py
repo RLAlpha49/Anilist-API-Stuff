@@ -17,9 +17,6 @@ def install_packages():
     """
     Installs the specified Python packages using pip.
 
-    Args:
-        packages (list): A list of strings where each string is a package name.
-
     This function iterates over the list of packages and attempts to install each one using pip.
     If the installation of a package fails, it prints an error message.
     If Python or pip is not installed on the system, it prints an error message and exits.
