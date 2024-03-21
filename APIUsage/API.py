@@ -11,7 +11,6 @@ Functions:
 # Import necessary modules
 import os
 import platform
-
 import webbrowser
 
 # Define the authorization URL for AniList OAuth

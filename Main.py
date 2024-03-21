@@ -21,7 +21,6 @@ from AnilistUserActions import (
     LikeFollowingFeed,
     LikeUsersActivity,
 )
-
 from APIUsage.Utils import Get_Valid_Input
 from Setup import Setup
 

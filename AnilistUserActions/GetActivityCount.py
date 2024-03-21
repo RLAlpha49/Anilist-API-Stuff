@@ -1,5 +1,5 @@
 """
-This module contains a function to fetch and return the activity count of the user. 
+This module contains a function to fetch and return the activity count of the user.
 It gets user inputs for activities per page, total pages, and whether to include message activity.
 Then, it fetches liked activities based on user inputs.
 """

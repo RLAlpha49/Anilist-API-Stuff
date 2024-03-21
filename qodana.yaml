@@ -5,3 +5,5 @@ exclude:
   - name: PyPep8NamingInspection
   - name: PyRelativeImportInspection
   - name: PyGlobalUndefinedInspection
+  - name: PyInterpreterInspection
+  - name: PyUnresolvedReferencesInspection

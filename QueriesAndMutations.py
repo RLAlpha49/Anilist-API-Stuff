@@ -253,9 +253,9 @@ class Queries:
         query ($userId: Int, $page: Int, $perPage: Int, $createdAtGreater: Int, $createdAtLesser: Int) {
             Page(page: $page, perPage: $perPage) {
                 activities(
-                    userId: $userId, 
-                    sort: ID_DESC, 
-                    createdAt_greater: $createdAtGreater, 
+                    userId: $userId,
+                    sort: ID_DESC,
+                    createdAt_greater: $createdAtGreater,
                     createdAt_lesser: $createdAtLesser
                 ) {
                     ... on TextActivity {

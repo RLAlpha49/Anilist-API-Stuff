@@ -12,7 +12,6 @@ This module contains functions to interact with the Instagram API. It includes f
 
 # Import necessary modules
 import Config
-
 from APIUsage.UserActions import Unfollow_User
 from APIUsage.Utils import (
     Get_Followers,
