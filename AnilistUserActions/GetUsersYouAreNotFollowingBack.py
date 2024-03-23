@@ -8,7 +8,7 @@ back, and offers to exclude them from the unfollowed IDs list. If there are such
 users, the function offers to follow them.
 """
 
-# pylint: disable=C0103
+# pylint: disable=C0103, R0801
 
 # Import necessary modules
 from APIUsage.UserActions import Follow_User

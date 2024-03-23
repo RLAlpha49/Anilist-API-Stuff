@@ -12,7 +12,7 @@ Functions:
 # Import necessary modules
 import time
 
-import requests
+import requests  # pylint: disable=E0401
 
 # Define the API endpoint
 URL = "https://graphql.anilist.co"

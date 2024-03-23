@@ -8,7 +8,7 @@ This module contains functions to interact with the Instagram API. It includes f
 - Print statistics about followers, following, excluded IDs, and users not following back
 """
 
-# pylint: disable=C0103
+# pylint: disable=C0103, R0801
 
 # Import necessary modules
 import Config
