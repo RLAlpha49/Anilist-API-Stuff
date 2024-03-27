@@ -7,8 +7,8 @@ sets up the environment variables, and manages the access token for the Anilist 
 # pylint: disable=C0103
 
 # Import necessary modules
-import Config
-from APIUsage.Utils import Check_Access_Token, Get_Access_Token, Set_Access_Token
+from src import Config
+from src.APIUsage.Utils import Check_Access_Token, Get_Access_Token, Set_Access_Token
 
 
 def Setup():

@@ -7,8 +7,8 @@ then calls a function to get the global activities of the specified number of pe
 # pylint: disable=C0103
 
 # Import necessary modules
-from APIUsage.ActivityActions import Get_Global_Activities
-from APIUsage.Utils import Get_User_ID, Get_Valid_Input, Is_Positive_Integer
+from src.APIUsage.ActivityActions import Get_Global_Activities
+from src.APIUsage.Utils import Get_User_ID, Get_Valid_Input, Is_Positive_Integer
 
 
 def FollowRandomUsers():

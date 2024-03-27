@@ -10,8 +10,7 @@ getting follow data, comparing followers and following, and validating user inpu
 # Import necessary modules
 import operator
 
-import Config
-import QueriesAndMutations as QM
+from .. import Config, QueriesAndMutations as QM
 import requests  # pylint: disable=C0411
 
 from .API import Get_Access_Token  # pylint: disable=E0402

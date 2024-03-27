@@ -11,9 +11,9 @@ This module contains functions to interact with the Instagram API. It includes f
 # pylint: disable=C0103, R0801
 
 # Import necessary modules
-import Config
-from APIUsage.UserActions import Unfollow_User
-from APIUsage.Utils import (
+from src import Config
+from src.APIUsage.UserActions import Unfollow_User
+from src.APIUsage.Utils import (
     Get_Followers,
     Get_Following,
     Get_User_ID,

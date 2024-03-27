@@ -7,9 +7,8 @@ This module contains the actions related to activities.
 # Import necessary modules
 import time
 
-import Config
+from .. import Config, QueriesAndMutations as QM
 import keyboard  # pylint: disable=C0411
-import QueriesAndMutations as QM
 import requests  # pylint: disable=C0411
 
 from .APIRequests import API_Request  # pylint: disable=E0402
@@ -205,7 +204,7 @@ def Like_Following_Activities(refresh_interval, total_pages):
 
     viewer_ID = Get_User_ID()
 
-    def set_stop():
+    def set_stop(event):
         nonlocal state
         state["stop"] = True
 

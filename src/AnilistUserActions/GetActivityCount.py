@@ -7,8 +7,8 @@ Then, it fetches liked activities based on user inputs.
 # pylint: disable=C0103
 
 # Import necessary modules
-from APIUsage.ActivityActions import Get_Liked_Activities
-from APIUsage.Utils import Get_Valid_Input
+from src.APIUsage.ActivityActions import Get_Liked_Activities
+from src.APIUsage.Utils import Get_Valid_Input
 
 
 # Function to get the count of activities

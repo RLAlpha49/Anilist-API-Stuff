@@ -12,8 +12,8 @@ This module also contains helper functions `get_user_list` and `get_activities_t
 # pylint: disable=C0103
 
 # Import necessary modules
-from APIUsage.ActivityActions import Like_Activities
-from APIUsage.Utils import (
+from src.APIUsage.ActivityActions import Like_Activities
+from src.APIUsage.Utils import (
     Get_Mutual_Followers,
     Get_Not_Followed_Followers,
     Get_User_ID,

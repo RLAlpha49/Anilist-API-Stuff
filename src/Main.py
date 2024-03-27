@@ -13,15 +13,12 @@ Functions:
 # pylint: disable=C0103
 
 # Import necessary modules
-from AnilistUserActions import (
+from src.AnilistUserActions import (
     FollowRandomUsers,
-    GetActivityCount,
-    GetUsersNotFollowingBack,
     GetUsersYouAreNotFollowingBack,
-    LikeFollowingFeed,
-    LikeUsersActivity,
 )
-from APIUsage.Utils import Get_Valid_Input
+from src.AnilistUserActions import LikeFollowingFeed, LikeUsersActivity, GetActivityCount, GetUsersNotFollowingBack
+from src.APIUsage.Utils import Get_Valid_Input
 from Setup import Setup
 
 

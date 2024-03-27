@@ -1,6 +1,6 @@
 __pycache__
-config.json
-excluded_ids.json
+src/config.json
+src/excluded_ids.json
 dist
-unfollowed_ids.json
+src/unfollowed_ids.json
 /.idea

@@ -10,8 +10,8 @@ activities from. The function will continue to like activities until the
 # pylint: disable=C0103
 
 # Import necessary modules
-from APIUsage.ActivityActions import Like_Following_Activities
-from APIUsage.Utils import Get_User_ID, Get_Valid_Input
+from src.APIUsage.ActivityActions import Like_Following_Activities
+from src.APIUsage.Utils import Get_User_ID, Get_Valid_Input
 
 
 def LikeFollowingFeed():

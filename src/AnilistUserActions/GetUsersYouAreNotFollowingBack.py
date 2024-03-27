@@ -11,9 +11,9 @@ users, the function offers to follow them.
 # pylint: disable=C0103, R0801
 
 # Import necessary modules
-from APIUsage.UserActions import Follow_User
-from APIUsage.Utils import Get_Followers, Get_Following, Get_User_ID, Get_Valid_Input
-from Config import load_unfollowed_ids
+from src.APIUsage.UserActions import Follow_User
+from src.APIUsage.Utils import Get_Followers, Get_Following, Get_User_ID, Get_Valid_Input
+from src.Config import load_unfollowed_ids
 
 
 # Function to print statistics about followers and following
