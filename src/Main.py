@@ -14,7 +14,6 @@ Functions:
 
 # Import necessary modules
 from Setup import Setup
-
 from src.AnilistUserActions import (
     FollowRandomUsers,
     GetActivityCount,

@@ -13,11 +13,7 @@ import requests  # pylint: disable=C0411
 from .. import Config
 from .. import QueriesAndMutations as QM
 from .APIRequests import API_Request
-from .UserActions import (
-    Follow_User,
-    Like_Activity,
-    Unfollow_User,
-)
+from .UserActions import Follow_User, Like_Activity, Unfollow_User
 from .Utils import (
     Convert_Time_To_Seconds,
     Get_Following,
