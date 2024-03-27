@@ -2,22 +2,23 @@
 This module contains the actions related to activities.
 """
 
-# pylint: disable=C0103, E0401
+# pylint: disable=C0103, E0401, E0402
 
 # Import necessary modules
 import time
 
-from .. import Config, QueriesAndMutations as QM
 import keyboard  # pylint: disable=C0411
 import requests  # pylint: disable=C0411
 
-from .APIRequests import API_Request  # pylint: disable=E0402
-from .UserActions import (  # pylint: disable=E0402
+from .. import Config
+from .. import QueriesAndMutations as QM
+from .APIRequests import API_Request
+from .UserActions import (
     Follow_User,
     Like_Activity,
     Unfollow_User,
 )
-from .Utils import (  # pylint: disable=E0402
+from .Utils import (
     Convert_Time_To_Seconds,
     Get_Following,
     Get_User_ID,
@@ -204,7 +205,7 @@ def Like_Following_Activities(refresh_interval, total_pages):
 
     viewer_ID = Get_User_ID()
 
-    def set_stop(event):
+    def set_stop(event):  # pylint: disable=W0613
         nonlocal state
         state["stop"] = True
 

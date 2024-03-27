@@ -8,12 +8,11 @@ Functions:
     Follow_User: Follows a user.
 """
 
-# pylint: disable=C0103, E0401
+# pylint: disable=C0103, E0401, E0402
 
 # Import necessary modules
 from .. import QueriesAndMutations as QM
-
-from .APIRequests import API_Request  # pylint: disable=E0402
+from .APIRequests import API_Request
 
 
 def Like_Activity(activity_id):

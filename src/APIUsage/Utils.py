@@ -5,16 +5,17 @@ It includes functions for setting and checking access tokens, retrieving user ID
 getting follow data, comparing followers and following, and validating user input.
 """
 
-# pylint: disable=C0103, E0401
+# pylint: disable=C0103, E0401, E0402
 
 # Import necessary modules
 import operator
 
-from .. import Config, QueriesAndMutations as QM
 import requests  # pylint: disable=C0411
 
-from .API import Get_Access_Token  # pylint: disable=E0402
-from .APIRequests import API_Request, Set_Headers  # pylint: disable=E0402
+from .. import Config
+from .. import QueriesAndMutations as QM
+from .API import Get_Access_Token
+from .APIRequests import API_Request, Set_Headers
 
 # Define the API endpoint
 URL = "https://graphql.anilist.co"
