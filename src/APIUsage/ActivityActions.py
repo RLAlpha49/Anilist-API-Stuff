@@ -47,19 +47,21 @@ def Get_Global_Activities(total_people_to_follow, follower_threshold):
     print()
 
     while people_processed < total_people_to_follow:
-        user_ids = []
+        user_ids = set()
         query, variables = QM.Queries.Global_Activity_Feed_Query(page)
         response = API_Request(query, variables)
 
-        # Add the user ids to the list if they are not in "following" or "unfollowed_ids"
+        # Add the user ids to the set if they are not in "following" or "unfollowed_ids"
         for activity in response["data"]["Page"]["activities"]:
             if "user" in activity:
                 user_id = activity["user"]["id"]
                 if user_id not in following and user_id not in unfollowed_ids:
-                    user_ids.append(user_id)
+                    user_ids.add(user_id)
 
         # Generate the Get_Multiple_Follower_Counts_Query with the user_ids
-        follower_count_query = QM.Queries.Get_Multiple_Follower_Counts_Query(user_ids)
+        follower_count_query = QM.Queries.Get_Multiple_Follower_Counts_Query(
+            list(user_ids)
+        )
         follower_count_response = API_Request(follower_count_query, {})
 
         # Parse the response for each user_id and their associated follower count
@@ -71,15 +73,16 @@ def Get_Global_Activities(total_people_to_follow, follower_threshold):
             if follower_count >= follower_threshold:
                 if Follow_User(user_id):
                     followed_user_ids.append(user_id)
+                    following.append(user_id)
                     people_processed += 1
                     people_followed_this_page += 1
 
         # Print the number of people followed after each page
         if people_followed_this_page > 0:
-            print(f"\nPage {page}: Followed {people_followed_this_page} people.")
+            print(f"Page {page}: Followed {people_followed_this_page} people.\n")
         else:
             print(
-                f"\nPage {page}: No one was followed. (Consider decreasing follower threshold)"
+                f"Page {page}: No one was followed. (Consider decreasing follower threshold)\n"
             )
 
         # Go to the next page

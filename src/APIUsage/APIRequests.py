@@ -51,9 +51,14 @@ def API_Request(query, variables=None):
     Returns:
         dict: The JSON response from the API if the request is successful, None otherwise.
     """
-    response = requests.post(
-        URL, json={"query": query, "variables": variables}, headers=headers, timeout=10
-    )
+    for _ in range(5):
+        try:
+            response = requests.post(
+                URL, json={"query": query, "variables": variables}, headers=headers, timeout=10
+            )
+            break
+        except requests.exceptions.ReadTimeout:
+            print("Request timed out. Retrying...")
     # print(response.json())
     Handle_Rate_Limit(response)
     if response.status_code == 200:
