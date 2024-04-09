@@ -104,6 +104,28 @@ class Queries:
         )
 
     @staticmethod
+    def Get_Multiple_Follower_Counts_Query(user_ids):
+        """
+        Constructs and returns a GraphQL query to get the follower count of multiple users.
+
+        Args:
+            user_ids (list): The IDs of the users.
+
+        Returns:
+            str: A GraphQL query that requests the follower count of the users.
+        """
+        user_queries = "\n".join(
+            f"followers{user_id}: Page(perPage: 1) {{ pageInfo {{ total }} followers(userId: {user_id}) {{ id }} }}"
+            for user_id in user_ids
+        )
+        Query = f"""
+        query {{
+            {user_queries}
+        }}
+        """
+        return Query
+
+    @staticmethod
     def Following_Query(user_id, page):
         """
         Constructs and returns a GraphQL query for the users followed by a user and

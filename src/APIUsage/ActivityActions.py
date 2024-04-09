@@ -24,61 +24,68 @@ from .Utils import (
 )
 
 
-def Get_Global_Activities(total_people_to_follow):
+def Get_Global_Activities(total_people_to_follow, follower_threshold):
     """
-    Retrieves global activities and follows users.
+    Retrieves global activities, gets follower counts of users, and follows them.
 
-    This function retrieves global activities from the Anilist API and follows
-    users who are not already being followed and have not been unfollowed
-    before. It stops when it has followed the specified number of people.
+    This function retrieves global activities from the Anilist API, gets
+    the follower counts of users who have more than a certain number of followers,
+    and follows them. It stops when it has processed the specified number of people.
 
     Args:
-        total_people_to_follow (int): The total number of people to follow.
+        total_people_to_follow (int): The total number of people to process.
+        follower_threshold (int): The minimum number of followers a user must have.
 
     Returns:
-        list: A list of IDs of the activities retrieved in the last API request.
+        list: A list of user IDs who have been followed.
     """
     page = 1
-    people_followed = 0
+    people_processed = 0
+    followed_user_ids = []
     following = Get_Following()
     unfollowed_ids = Config.load_unfollowed_ids()
     print()
 
-    activity_ids = []
-
-    while people_followed < total_people_to_follow:
+    while people_processed < total_people_to_follow:
+        user_ids = []
         query, variables = QM.Queries.Global_Activity_Feed_Query(page)
         response = API_Request(query, variables)
 
-        # Add the ids to the list and follow the user if they are not following the main user
-        activity_ids = (
-            activity["id"]
-            for activity in response["data"]["Page"]["activities"]
-            if "user" in activity
-        )
-        for activity_id in activity_ids:
-            user_id = next(
-                (
-                    activity["user"]["id"]
-                    for activity in response["data"]["Page"]["activities"]
-                    if activity["id"] == activity_id
-                ),
-                None,
+        # Add the user ids to the list if they are not in "following" or "unfollowed_ids"
+        for activity in response["data"]["Page"]["activities"]:
+            if "user" in activity:
+                user_id = activity["user"]["id"]
+                if user_id not in following and user_id not in unfollowed_ids:
+                    user_ids.append(user_id)
+
+        # Generate the Get_Multiple_Follower_Counts_Query with the user_ids
+        follower_count_query = QM.Queries.Get_Multiple_Follower_Counts_Query(user_ids)
+        follower_count_response = API_Request(follower_count_query, {})
+
+        # Parse the response for each user_id and their associated follower count
+        people_followed_this_page = 0
+        for user_id in user_ids:
+            follower_count = follower_count_response["data"][f"followers{user_id}"][
+                "pageInfo"
+            ]["total"]
+            if follower_count >= follower_threshold:
+                if Follow_User(user_id):
+                    followed_user_ids.append(user_id)
+                    people_processed += 1
+                    people_followed_this_page += 1
+
+        # Print the number of people followed after each page
+        if people_followed_this_page > 0:
+            print(f"\nPage {page}: Followed {people_followed_this_page} people.")
+        else:
+            print(
+                f"\nPage {page}: No one was followed. (Consider decreasing follower threshold)"
             )
-            if (
-                user_id
-                and user_id not in following
-                and user_id not in unfollowed_ids
-                and people_followed < total_people_to_follow
-            ):
-                Follow_User(user_id)
-                following.append(user_id)
-                people_followed += 1
 
         # Go to the next page
         page += 1
 
-    return list(activity_ids)
+    return followed_user_ids
 
 
 def Like_Activities(total_activities_to_like, include_message_activity, user_list=None):

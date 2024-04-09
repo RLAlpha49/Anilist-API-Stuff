@@ -16,7 +16,8 @@ def FollowRandomUsers():
     Follows a specified number of random users.
 
     The function asks the user for the number of people they would like to follow,
-    then calls a function to get the global activities of the specified number of people.
+    and the follower threshold, then calls a function to get the global activities
+    of the specified number of people.
     """
     print()
     # Get the current user's ID
@@ -25,5 +26,9 @@ def FollowRandomUsers():
         "Enter the number of people you would like to follow: ",
         validation_func=Is_Positive_Integer,
     )
+    follower_threshold = Get_Valid_Input(
+        "Enter the follower threshold (number of followers the users need to be followed): ",
+        validation_func=Is_Positive_Integer,
+    )
     # Call the function to get global activities of the specified number of people
-    Get_Global_Activities(total_people_to_follow)
+    Get_Global_Activities(total_people_to_follow, follower_threshold)
