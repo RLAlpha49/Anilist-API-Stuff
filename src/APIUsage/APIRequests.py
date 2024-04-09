@@ -2,7 +2,6 @@
 This module contains functions for handling API requests and rate limits.
 
 Functions:
-    Handle_Rate_Limit: Handles the rate limit of the API.
     API_Request: Sends a POST request to the API.
     Set_Headers: Sets the headers for the API requests.
 """
@@ -18,57 +17,38 @@ import requests  # pylint: disable=E0401
 URL = "https://graphql.anilist.co"
 
 
-def Handle_Rate_Limit(response):
-    """
-    Handles the rate limit of the API.
-
-    Args:
-        response (requests.Response): The response from the API request.
-
-    Returns:
-        None
-    """
-    rate_limit_remaining = int(response.headers.get("X-RateLimit-Remaining", 0))
-    rate_limit_reset = int(response.headers.get("X-RateLimit-Reset", 0))
-    if response.status_code == 429:
-        wait_time = max(rate_limit_reset - int(time.time()), 60)
-        print(f"\nRate limit hit. Waiting for {wait_time} seconds.\n")
-        time.sleep(wait_time)
-    elif rate_limit_remaining < 5:
-        print(
-            f"Warning: Only {rate_limit_remaining} requests remaining until rate limit reset."
-        )
-
-
-def API_Request(query, variables=None):
+def API_Request(query, variables=None, max_retries=10):
     """
     Sends a POST request to the API.
 
     Args:
         query (str): The GraphQL query to send.
         variables (dict, optional): The variables for the GraphQL query. Defaults to None.
+        max_retries (int, optional): The maximum number of retries if the request fails. Defaults to 10.
 
     Returns:
         dict: The JSON response from the API if the request is successful, None otherwise.
     """
-    for _ in range(5):
+    for _ in range(max_retries):
         try:
             response = requests.post(
-                URL, json={"query": query, "variables": variables}, headers=headers, timeout=10
+                URL, json={"query": query, "variables": variables}, headers=headers, timeout=15
             )
-            break
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                print("\nRate limit hit. Waiting for 60 seconds.\n")
+                time.sleep(60)
+            elif response.status_code == 500:
+                print("\nAnilist server error. Retrying...\n")
+                time.sleep(5)
+            elif response.status_code == 502:
+                print("\nServer/Gateway error. Retrying...\n")
+                time.sleep(5)
+            else:
+                print(f"\nFailed to retrieve data. Status code: {response.status_code}\n")
         except requests.exceptions.ReadTimeout:
             print("Request timed out. Retrying...")
-    # print(response.json())
-    Handle_Rate_Limit(response)
-    if response.status_code == 200:
-        return response.json()
-    if response.status_code == 429:
-        return API_Request(query, variables)
-    if response.status_code == 502:
-        print("\nServer/Gateway error. Retrying...\n")
-        return API_Request(query, variables)
-    print(f"\nFailed to retrieve data. Status code: {response.status_code}\n")
     return None
 
 
