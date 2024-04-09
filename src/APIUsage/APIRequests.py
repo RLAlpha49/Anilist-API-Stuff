@@ -32,8 +32,9 @@ def API_Request(query, variables=None, max_retries=10):
     for _ in range(max_retries):
         try:
             response = requests.post(
-                URL, json={"query": query, "variables": variables}, headers=headers, timeout=15
+                URL, json={"query": query, "variables": variables}, headers=headers, timeout=20
             )
+            # print(f"Response: {response.json()}")
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:
