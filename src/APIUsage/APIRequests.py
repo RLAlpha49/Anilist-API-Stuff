@@ -32,22 +32,26 @@ def API_Request(query, variables=None, max_retries=10):
     for _ in range(max_retries):
         try:
             response = requests.post(
-                URL, json={"query": query, "variables": variables}, headers=headers, timeout=20
+                URL,
+                json={"query": query, "variables": variables},
+                headers=headers,
+                timeout=20,
             )
-            # print(f"Response: {response.json()}")
             if response.status_code == 200:
                 return response.json()
-            elif response.status_code == 429:
+            if response.status_code == 429:
                 print("\nRate limit hit. Waiting for 60 seconds.\n")
                 time.sleep(60)
-            elif response.status_code == 500:
+                continue
+            if response.status_code == 500:
                 print("\nAnilist server error. Retrying...\n")
                 time.sleep(5)
-            elif response.status_code == 502:
+                continue
+            if response.status_code == 502:
                 print("\nServer/Gateway error. Retrying...\n")
                 time.sleep(5)
-            else:
-                print(f"\nFailed to retrieve data. Status code: {response.status_code}\n")
+                continue
+            print(f"\nFailed to retrieve data. Status code: {response.status_code}\n")
         except requests.exceptions.ReadTimeout:
             print("Request timed out. Retrying...")
     return None

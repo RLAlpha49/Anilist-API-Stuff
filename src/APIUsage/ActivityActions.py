@@ -24,7 +24,9 @@ from .Utils import (
 )
 
 
-def Get_Global_Activities(total_people_to_follow, follower_threshold):
+def Get_Global_Activities(  # pylint: disable=R0914
+    total_people_to_follow, follower_threshold
+):
     """
     Retrieves global activities, gets follower counts of users, and follows them.
 

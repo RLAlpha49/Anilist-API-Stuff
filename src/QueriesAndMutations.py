@@ -115,7 +115,12 @@ class Queries:
             str: A GraphQL query that requests the follower count of the users.
         """
         user_queries = "\n".join(
-            f"followers{user_id}: Page(perPage: 1) {{ pageInfo {{ total }} followers(userId: {user_id}) {{ id }} }}"
+            (
+                f"followers{user_id}: Page(perPage: 1) {{"
+                f" pageInfo {{ total }}"
+                f" followers(userId: {user_id}) {{ id }}"
+                f" }}"
+            )
             for user_id in user_ids
         )
         Query = f"""
