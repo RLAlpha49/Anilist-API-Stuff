@@ -24,7 +24,7 @@ def API_Request(query, variables=None, max_retries=10):
     Args:
         query (str): The GraphQL query to send.
         variables (dict, optional): The variables for the GraphQL query. Defaults to None.
-        max_retries (int, optional): The maximum number of retries if the request fails. Defaults to 10.
+        max_retries (int, optional): The maximum number of retries if the request fails.
 
     Returns:
         dict: The JSON response from the API if the request is successful, None otherwise.
