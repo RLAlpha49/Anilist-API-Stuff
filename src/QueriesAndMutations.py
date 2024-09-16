@@ -224,6 +224,7 @@ class Queries:
                         isLiked
                         user {
                             id
+                            isFollower
                         }
                     }
                     ... on ListActivity {
@@ -231,6 +232,7 @@ class Queries:
                         isLiked
                         user {
                             id
+                            isFollower
                         }
                     }
                 }
