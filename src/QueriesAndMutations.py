@@ -218,7 +218,7 @@ class Queries:
                     hasNextPage
                     perPage
                 }
-                activities(sort: ID_DESC, isFollowing: $isFollowing) {
+                activities(sort: ID_DESC, type_in:[TEXT,ANIME_LIST,MANGA_LIST], isFollowing: $isFollowing) {
                     ... on TextActivity {
                         id
                         isLiked
