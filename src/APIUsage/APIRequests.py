@@ -1,20 +1,46 @@
 """
-This module contains functions for handling API requests and rate limits.
+This module contains functions for making API requests to the Anilist GraphQL API.
 
 Functions:
-    API_Request: Sends a POST request to the API.
-    Set_Headers: Sets the headers for the API requests.
+- handle_status_code(status_code): Handles the status code of the API response.
+- API_Request(query, variables=None, max_retries=10): Sends a POST request to the API.
+- Set_Headers(header): Sets the headers for the API requests.
+
+The module uses the `requests` library to send HTTP requests and the `logging` library for logging information.
 """
 
-# pylint: disable=C0103
-
-# Import necessary modules
 import time
-
-import requests  # pylint: disable=E0401
+import requests
+import logging
 
 # Define the API endpoint
 URL = "https://graphql.anilist.co"
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+
+
+def handle_status_code(status_code):
+    """
+    Handles the status code of the API response.
+
+    Args:
+        status_code (int): The HTTP status code from the API response.
+
+    Returns:
+        bool: True if the status code is 200, False otherwise.
+    """
+    if status_code == 200:
+        return True
+    elif status_code == 429:
+        logging.info("Rate limit hit. Waiting for 60 seconds.")
+        time.sleep(60)
+    elif status_code in {500, 502}:
+        logging.info("Server error. Retrying in 5 seconds.")
+        time.sleep(5)
+    else:
+        logging.error(f"Failed to retrieve data. Status code: {status_code}")
+    return False
 
 
 def API_Request(query, variables=None, max_retries=10):
@@ -24,7 +50,7 @@ def API_Request(query, variables=None, max_retries=10):
     Args:
         query (str): The GraphQL query to send.
         variables (dict, optional): The variables for the GraphQL query. Defaults to None.
-        max_retries (int, optional): The maximum number of retries if the request fails.
+        max_retries (int, optional): The maximum number of retries if the request fails. Defaults to 10.
 
     Returns:
         dict: The JSON response from the API if the request is successful, None otherwise.
@@ -37,23 +63,10 @@ def API_Request(query, variables=None, max_retries=10):
                 headers=headers,
                 timeout=20,
             )
-            if response.status_code == 200:
+            if handle_status_code(response.status_code):
                 return response.json()
-            if response.status_code == 429:
-                print("\nRate limit hit. Waiting for 60 seconds.\n")
-                time.sleep(60)
-                continue
-            if response.status_code == 500:
-                print("\nAnilist server error. Retrying...\n")
-                time.sleep(5)
-                continue
-            if response.status_code == 502:
-                print("\nServer/Gateway error. Retrying...\n")
-                time.sleep(5)
-                continue
-            print(f"\nFailed to retrieve data. Status code: {response.status_code}\n")
         except requests.exceptions.ReadTimeout:
-            print("Request timed out. Retrying...")
+            logging.warning("Request timed out. Retrying...")
     return None
 
 
