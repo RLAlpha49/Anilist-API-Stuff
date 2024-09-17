@@ -8,7 +8,56 @@ sets up the environment variables, and manages the access token for the Anilist 
 
 # Import necessary modules
 from src import Config
-from src.APIUsage.Utils import Check_Access_Token, Get_Access_Token, Set_Access_Token
+from src.APIUsage.Utils import check_access_token, get_access_token, set_access_token
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+
+
+def prompt_for_client_and_secret() -> dict:
+    """
+    Prompts the user to enter the Client ID and Secret ID.
+
+    Returns:
+        dict: A dictionary containing the Client ID and Secret ID.
+    """
+    input("Config file not found. Press enter to continue...")
+    print(
+        "Please create an API on Anilist for the following values "
+        "(Set Redirect URL to: https://anilist.co/api/v2/oauth/pin):"
+    )
+    client = input("Enter Client ID: ")
+    secret = input("Enter Secret ID: ")
+    return {"client": client, "secret": secret}
+
+
+def setup_environment(config: dict):
+    """
+    Sets up the environment variables and access token.
+
+    Args:
+        config (dict): The configuration dictionary.
+    """
+    Config.Set_Environment_Variables(config)
+    set_access_token()
+
+
+def refresh_access_token(client: str, secret: str, headers: dict):
+    """
+    Refreshes the access token if it is not valid.
+
+    Args:
+        client (str): The Client ID.
+        secret (str): The Secret ID.
+        headers (dict): The headers for the API request.
+    """
+    refresh = check_access_token(headers)
+    while refresh:
+        config = Config.create_config(client, secret, get_access_token())
+        Config.save_config(config, "config.json")
+        set_access_token()
+        refresh = check_access_token(headers)
 
 
 def Setup():
@@ -22,28 +71,17 @@ def Setup():
     # Load configuration and ask for client and secret IDs if not found
     config = Config.load_config("config.json")
     if not config:
-        input("Config file not found. Press enter to continue...")
-        print(
-            "Please create an API on Anilist for the following values "
-            "(Set Redirect URL to: https://anilist.co/api/v2/oauth/pin):"
+        credentials = prompt_for_client_and_secret()
+        config = Config.create_config(
+            credentials["client"], credentials["secret"], get_access_token()
         )
-        client = input("Enter Client ID: ")
-        secret = input("Enter Secret ID: ")
-
-        # Create and save new configuration, set environment variables and access token
-        config = Config.create_config(client, secret, Get_Access_Token())
         Config.save_config(config, "config.json")
-        Config.Set_Environment_Variables(config)
-        Set_Access_Token()
+        setup_environment(config)
     else:
-        client = config["ANILIST_CLIENT_ID"]
-        secret = config["ANILIST_CLIENT_SECRET"]
-        Config.Set_Environment_Variables(config)
+        setup_environment(config)
 
     # Refresh access token if it's not valid
-    refresh = Check_Access_Token()
-    while refresh:
-        config = Config.create_config(client, secret, Get_Access_Token())
-        Config.save_config(config, "config.json")
-        Set_Access_Token()
-        refresh = Check_Access_Token()
+    headers = {"Authorization": f"Bearer {config['ACCESS_TOKEN']}"}
+    refresh_access_token(
+        config["ANILIST_CLIENT_ID"], config["ANILIST_CLIENT_SECRET"], headers
+    )

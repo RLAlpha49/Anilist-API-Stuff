@@ -7,11 +7,15 @@ then calls a function to get the global activities of the specified number of pe
 # pylint: disable=C0103
 
 # Import necessary modules
-from src.APIUsage.ActivityActions import Get_Global_Activities
-from src.APIUsage.Utils import Get_User_ID, Get_Valid_Input, Is_Positive_Integer
+import logging
+from src.APIUsage.ActivityActions import get_global_activities
+from src.APIUsage.Utils import get_user_id, get_valid_input, is_positive_integer
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 
-def FollowRandomUsers():
+def FollowRandomUsers() -> None:
     """
     Follows a specified number of random users.
 
@@ -19,16 +23,15 @@ def FollowRandomUsers():
     and the follower threshold, then calls a function to get the global activities
     of the specified number of people.
     """
-    print()
-    # Get the current user's ID
-    Get_User_ID()
-    total_people_to_follow = Get_Valid_Input(
+    logging.info("Starting to follow random users.")
+    get_user_id()
+    total_people_to_follow = get_valid_input(
         "Enter the number of people you would like to follow: ",
-        validation_func=Is_Positive_Integer,
+        validation_func=is_positive_integer,
     )
-    follower_threshold = Get_Valid_Input(
+    follower_threshold = get_valid_input(
         "Enter the follower threshold (number of followers the users need to be followed): ",
-        validation_func=Is_Positive_Integer,
+        validation_func=is_positive_integer,
     )
-    # Call the function to get global activities of the specified number of people
-    Get_Global_Activities(total_people_to_follow, follower_threshold)
+    get_global_activities(total_people_to_follow, follower_threshold)
+    logging.info("Finished following random users.")

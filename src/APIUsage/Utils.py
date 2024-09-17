@@ -9,22 +9,22 @@ getting follow data, comparing followers and following, and validating user inpu
 
 # Import necessary modules
 import operator
-
+import logging
 import requests  # pylint: disable=C0411
 
 from .. import Config
 from .. import QueriesAndMutations as QM
-from .API import Get_Access_Token
+from .API import get_access_token
 from .APIRequests import API_Request, Set_Headers
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 # Define the API endpoint
 URL = "https://graphql.anilist.co"
 
-# Token and header related functions: These functions are related
-# to setting and checking the access token.
 
-
-def Set_Access_Token():
+def set_access_token():
     """
     Sets the access token for the API requests.
 
@@ -32,7 +32,6 @@ def Set_Access_Token():
     sets it in the headers for the API requests, and saves it back to the
     configuration file if it was not found.
     """
-    global headers  # pylint: disable=w0601
     config = Config.load_config("config.json")
     try:
         if config["ACCESS_TOKEN"] is not None:
@@ -43,22 +42,22 @@ def Set_Access_Token():
             headers = {"Authorization": f"Bearer {access_token}"}
             Set_Headers(headers)
         else:
-            print("No access token found.")
-            config["ACCESS_TOKEN"] = Get_Access_Token()
+            logging.info("No access token found.")
+            config["ACCESS_TOKEN"] = get_access_token()
             Config.save_config(config, "config.json")
             Config.Set_Environment_Variables(config)
     except TypeError:
-        print("No config file found")
+        logging.error("No config file found")
         return
 
 
-def Check_Access_Token():
+def check_access_token(headers: dict) -> bool:
     """
     Checks the validity of the access token.
 
     This function sends a request to the API with the current access token.
-    If the response status code indicates an error, it prints an error message
-    and returns True. If the token is valid, it prints a success message and
+    If the response status code indicates an error, it logs an error message
+    and returns True. If the token is valid, it logs a success message and
     returns False. If the headers are not set, it sets the access token and
     checks again.
 
@@ -75,36 +74,31 @@ def Check_Access_Token():
             400: "Error: Invalid Access Token",
         }
         if response.status_code in status_code_errors:
-            print(status_code_errors[response.status_code])
+            logging.error(status_code_errors[response.status_code])
             return True
-        print("\nToken is valid.\n")
+        logging.info("Token is valid.")
         return False
     except NameError:
-        Set_Access_Token()
-        return Check_Access_Token()
+        set_access_token()
+        return check_access_token(headers)
 
 
-# User ID related functions: These functions are related to getting user IDs.
-
-
-def Get_User_ID():
+def get_user_id() -> int:
     """
     Retrieves the user ID of the authenticated user.
 
     This function sends a request to the API to retrieve the user ID of the
-    authenticated user and sets the global user_id variable to this value.
+    authenticated user and returns this value.
 
     Returns:
         int: The user ID of the authenticated user.
     """
-    global user_id  # pylint: disable=w0601
     query = QM.Queries.Check_Authentication()
     response = API_Request(query)
-    user_id = response["data"]["Viewer"]["id"]
     return response["data"]["Viewer"]["id"]
 
 
-def Get_User_ID_From_Username(username):
+def get_user_id_from_username(username: str) -> int:
     """
     Retrieves the user ID of a user given their username.
 
@@ -118,14 +112,13 @@ def Get_User_ID_From_Username(username):
     response = API_Request(query, variables)
     if "User" in response["data"] and "id" in response["data"]["User"]:
         return response["data"]["User"]["id"]
-    print(f"Error: User {username} not found")
+    logging.error(f"Error: User {username} not found")
     return None
 
 
-# Follow data related functions: These functions are related to getting follow data.
-
-
-def get_follow_data(query_func, message, key, page=1):
+def get_follow_data(
+    query_func, message: str, key: str, headers: dict, user_id: int, page: int = 1
+) -> list:
     """
     Retrieves follow data for a user.
 
@@ -134,8 +127,10 @@ def get_follow_data(query_func, message, key, page=1):
 
     Args:
         query_func (function): The function to generate the query and variables.
-        message (str): The message to print for each page of results.
+        message (str): The message to log for each page of results.
         key (str): The key to use to extract the data from the response.
+        headers (dict): The headers for the API request.
+        user_id (int): The user ID of the authenticated user.
         page (int, optional): The page of results to start from. Defaults to 1.
 
     Returns:
@@ -150,7 +145,7 @@ def get_follow_data(query_func, message, key, page=1):
         for user in response["data"]["Page"][key]:
             ids.append(user["id"])
 
-        print(
+        logging.info(
             f"{message}, Page {page} ID's: {ids[-len(response['data']['Page'][key]):]}"
         )
         if not response["data"]["Page"]["pageInfo"]["hasNextPage"]:
@@ -159,38 +154,45 @@ def get_follow_data(query_func, message, key, page=1):
     return ids
 
 
-def Get_Followers():
+def get_followers(headers: dict, user_id: int) -> list:
     """
     Retrieves the followers of the authenticated user.
 
     This function sends a request to the API to retrieve the followers of the
     authenticated user and returns a list of IDs of the followers.
 
+    Args:
+        headers (dict): The headers for the API request.
+        user_id (int): The user ID of the authenticated user.
+
     Returns:
         list: A list of IDs of the followers.
     """
-    return get_follow_data(QM.Queries.Follower_Query, "Checking Followers", "followers")
+    return get_follow_data(
+        QM.Queries.Follower_Query, "Checking Followers", "followers", headers, user_id
+    )
 
 
-def Get_Following():
+def get_following(headers: dict, user_id: int) -> list:
     """
     Retrieves the users that the authenticated user is following.
 
     This function sends a request to the API to retrieve the users that the
     authenticated user is following and returns a list of IDs of these users.
 
+    Args:
+        headers (dict): The headers for the API request.
+        user_id (int): The user ID of the authenticated user.
+
     Returns:
         list: A list of IDs of the users that the authenticated user is following.
     """
     return get_follow_data(
-        QM.Queries.Following_Query, "Checking Following", "following"
+        QM.Queries.Following_Query, "Checking Following", "following", headers, user_id
     )
 
 
-# Comparison functions: These functions are related to comparing followers and following.
-
-
-def Compare_Followers(followers, following, operation):
+def compare_followers(followers: list, following: list, operation: callable) -> list:
     """
     Compares the followers and following lists using a specified operation.
 
@@ -206,7 +208,7 @@ def Compare_Followers(followers, following, operation):
     return list(result)
 
 
-def Get_Mutual_Followers():
+def get_mutual_followers(headers: dict, user_id: int) -> list:
     """
     Retrieves the mutual followers of the authenticated user.
 
@@ -217,14 +219,14 @@ def Get_Mutual_Followers():
     Returns:
         list: A list of IDs of the mutual followers.
     """
-    followers = Get_Followers()
-    print()
-    following = Get_Following()
-    print()
-    return Compare_Followers(followers, following, operator.and_)
+    followers = get_followers(headers, user_id)
+    logging.info("")
+    following = get_following(headers, user_id)
+    logging.info("")
+    return compare_followers(followers, following, operator.and_)
 
 
-def Get_Not_Followed_Followers():
+def get_not_followed_followers(headers: dict) -> list:
     """
     Retrieves the followers of the authenticated user that the user is not following back.
 
@@ -235,17 +237,16 @@ def Get_Not_Followed_Followers():
     Returns:
         list: A list of IDs of the followers that the user is not following back.
     """
-    followers = Get_Followers()
-    print()
-    following = Get_Following()
-    print()
-    return Compare_Followers(followers, following, operator.sub)
+    followers = get_followers(headers)
+    logging.info("")
+    following = get_following(headers)
+    logging.info("")
+    return compare_followers(followers, following, operator.sub)
 
 
-# Input functions: These functions are related to getting user input.
-
-
-def Get_Valid_Input(prompt, valid_inputs=None, validation_func=None):
+def get_valid_input(
+    prompt: str, valid_inputs: list = None, validation_func: callable = None
+) -> str:
     """
     Prompts the user for input and validates it.
 
@@ -270,13 +271,13 @@ def Get_Valid_Input(prompt, valid_inputs=None, validation_func=None):
         if validation_func and validation_func(user_input):
             return (
                 int(user_input)
-                if validation_func == Is_Positive_Integer  # pylint: disable=W0143
+                if validation_func == is_positive_integer  # pylint: disable=W0143
                 else user_input
             )
-        print("Invalid input. Please try again.")
+        logging.error("Invalid input. Please try again.")
 
 
-def Is_Positive_Integer(s):
+def is_positive_integer(s: str) -> bool:
     """
     Checks if a string represents a positive integer.
 
@@ -289,7 +290,7 @@ def Is_Positive_Integer(s):
     return s.isdigit() and int(s) > 0
 
 
-def Is_Valid_Time_Period(s):
+def is_valid_time_period(s: str) -> bool:
     """
     Checks if a string represents a valid time period.
 
@@ -314,7 +315,7 @@ def Is_Valid_Time_Period(s):
     return False
 
 
-def Convert_Time_To_Seconds(time_back):
+def convert_time_to_seconds(time_back: str) -> int:
     """
     Converts a time period to seconds.
 

@@ -7,36 +7,51 @@ Then, it fetches liked activities based on user inputs.
 # pylint: disable=C0103
 
 # Import necessary modules
-from src.APIUsage.ActivityActions import Get_Liked_Activities
-from src.APIUsage.Utils import Get_Valid_Input
+import logging
+from src.APIUsage.ActivityActions import get_liked_activities
+from src.APIUsage.Utils import get_valid_input
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 
-# Function to get the count of activities
-def GetActivityCount():
+def get_user_inputs() -> tuple:
+    """
+    Gets user inputs for activities per page, total pages, and whether to include message activity.
+
+    Returns:
+        tuple: A tuple containing activities per page (int), total pages (int), and include message activity (bool).
+    """
+    per_page = int(
+        get_valid_input(
+            "\nEnter the number of activities per page (Max 50): ",
+            list(map(str, range(1, 51))),
+        )
+    )
+    total_pages = int(
+        input(
+            "Enter the total number of pages to go through "
+            "(There is no Max, program will stop when activities stop returning): "
+        )
+    )
+    logging.info(f"Total activities to check: {per_page * total_pages}\n")
+    include_message_activity = (
+        get_valid_input(
+            "Do you want to include message activities? (y/n): ", ["y", "n"]
+        ).lower()
+        == "y"
+    )
+    return per_page, total_pages, include_message_activity
+
+
+def GetActivityCount() -> int:
     """
     Fetches and returns the activity count of the user.
 
     Returns:
         int: The activity count of the user.
     """
-    # Get user inputs for activities per page, total pages, and whether to include message activity
-    perPage = Get_Valid_Input(
-        "\nEnter the number of activities per page (Max 50): ",
-        list(map(str, range(1, 51))),
-    )
-    totalPages = int(
-        input(
-            "Enter the total number of pages to go through "
-            "(There is no Max, program will stop when activities stop returning): "
-        )
-    )
-    print(f"Total activities to check: {int(perPage) * totalPages}\n")
-    include_message_activity = (
-        Get_Valid_Input(
-            "Do you want include message activities? (y/n): ", ["y", "n"]
-        ).lower()
-        == "y"
-    )
-    print()
-    # Fetch liked activities based on user inputs
-    Get_Liked_Activities(int(perPage), totalPages, include_message_activity)
+    per_page, total_pages, include_message_activity = get_user_inputs()
+    logging.info("Fetching liked activities based on user inputs.")
+    get_liked_activities(per_page, total_pages, include_message_activity)
+    logging.info("Finished fetching liked activities.")

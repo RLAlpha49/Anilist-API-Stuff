@@ -2,8 +2,8 @@
 This module contains functions for retrieving the access token and authentication code.
 
 Functions:
-    Get_Access_Token: Retrieves the access token from the environment variables.
-    Get_Authentication_Code: Retrieves the authentication code for a given client ID.
+    get_access_token: Retrieves the access token from the environment variables.
+    get_authentication_code: Retrieves the authentication code for a given client ID.
 """
 
 # pylint: disable=C0103
@@ -12,13 +12,16 @@ Functions:
 import os
 import platform
 import webbrowser
+import logging
 
 # Define the authorization URL for AniList OAuth
 AUTHORIZATION_URL = "https://anilist.co/api/v2/oauth/authorize"
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
-# Function to get the access token
-def Get_Access_Token():
+
+def get_access_token() -> str:
     """
     Retrieves the access token from the environment variables.
 
@@ -27,12 +30,11 @@ def Get_Access_Token():
     """
     client_id = os.environ.get("ANILIST_CLIENT_ID")
     if client_id:
-        return Get_Authentication_Code(client_id)
+        return get_authentication_code(client_id)
     return None
 
 
-# Function to get the authentication code
-def Get_Authentication_Code(client_id):
+def get_authentication_code(client_id: str) -> str:
     """
     Retrieves the authentication code for a given client ID.
 

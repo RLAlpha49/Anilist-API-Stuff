@@ -2,10 +2,10 @@
 This module contains functions for interacting with users and activities.
 
 Functions:
-    Like_Activity: Sends a 'like' action for a specific activity.
-    Toggle_Follow_User: Toggles the follow status of a user.
-    Unfollow_User: Unfollows a user.
-    Follow_User: Follows a user.
+    like_activity: Sends a 'like' action for a specific activity.
+    toggle_follow_user: Toggles the follow status of a user.
+    unfollow_user: Unfollows a user.
+    follow_user: Follows a user.
 """
 
 # pylint: disable=C0103, E0401, E0402
@@ -13,9 +13,13 @@ Functions:
 # Import necessary modules
 from .. import QueriesAndMutations as QM
 from .APIRequests import API_Request
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 
-def Like_Activity(activity_id):
+def like_activity(activity_id: str) -> bool:
     """
     Sends a 'like' action for a specific activity.
 
@@ -29,19 +33,21 @@ def Like_Activity(activity_id):
     response = API_Request(query, variables)
     if response is not None and "errors" not in response:
         return True
-    print(f"Failed to like activity with ID: {activity_id}")
+    logging.error(f"Failed to like activity with ID: {activity_id}")
     return False
 
 
-def Toggle_Follow_User(user_id, desired_status, success_message, error_message):
+def toggle_follow_user(
+    user_id: str, desired_status: bool, success_message: str, error_message: str
+) -> bool:
     """
     Toggles the follow status of a user.
 
     Args:
         user_id (str): The ID of the user to follow/unfollow.
         desired_status (bool): The desired follow status. True for follow, False for unfollow.
-        success_message (str): The message to print if the operation is successful.
-        error_message (str): The message to print if the operation fails.
+        success_message (str): The message to log if the operation is successful.
+        error_message (str): The message to log if the operation fails.
 
     Returns:
         bool: True if the operation was successful, False otherwise.
@@ -50,24 +56,25 @@ def Toggle_Follow_User(user_id, desired_status, success_message, error_message):
     response = API_Request(query, variables)
     if response is not None:
         if response["data"]["ToggleFollow"]["isFollowing"] == desired_status:
-            print(
+            logging.info(
                 success_message.format(
                     response["data"]["ToggleFollow"]["name"], user_id
                 )
             )
             return True
-        print(error_message.format(response["data"]["ToggleFollow"]["name"], user_id))
-        return Toggle_Follow_User(
+        logging.error(
+            error_message.format(response["data"]["ToggleFollow"]["name"], user_id)
+        )
+        return toggle_follow_user(
             user_id, desired_status, success_message, error_message
         )
-    print(
-        f"Failed to update follow status for user with ID: {user_id}"
-        "\nUser account most likely deleted."
+    logging.error(
+        f"Failed to update follow status for user with ID: {user_id}. User account most likely deleted."
     )
     return False
 
 
-def Unfollow_User(user_id):
+def unfollow_user(user_id: str) -> bool:
     """
     Unfollows a user.
 
@@ -77,7 +84,7 @@ def Unfollow_User(user_id):
     Returns:
         bool: True if the unfollow operation was successful, False otherwise.
     """
-    return Toggle_Follow_User(
+    return toggle_follow_user(
         user_id,
         False,
         "Unfollowed {} with ID: {}",
@@ -85,7 +92,7 @@ def Unfollow_User(user_id):
     )
 
 
-def Follow_User(user_id):
+def follow_user(user_id: str) -> bool:
     """
     Follows a user.
 
@@ -95,7 +102,7 @@ def Follow_User(user_id):
     Returns:
         bool: True if the follow operation was successful, False otherwise.
     """
-    return Toggle_Follow_User(
+    return toggle_follow_user(
         user_id,
         True,
         "Followed {} with ID: {}",
